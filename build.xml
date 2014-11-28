@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="zomb" default="dist" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
-    
-    <property file="ant.properties"/>
 
+    <!-- for a runnable jar file, add the main class name -->
+    <property name="main.class" value=""/>
+
+    <!-- basic paths -->
+    <property name="src.dir" location="src"/>
+    <property name="test.dir" location="test"/>
+    <property name="lib.dir" location="lib"/>
+    <property name="dist.dir" location="dist"/>
+    <property name="build.dir" location="build"/>
+
+    <!-- properties for build output, nothing should need to change beyond this point -->
     <property name="build.src.dir" location="${build.dir}/src"/>
     <property name="build.test.dir" location="${build.dir}/test"/>
     <property name="build.javadoc.dir" location="${build.dir}/docs"/>
@@ -21,7 +30,7 @@
         <mkdir dir="${build.src.dir}"/>
         <mkdir dir="${build.test.dir}"/>
     </target>
-  
+
     <!-- Ivy configuration -->
     <property name="ivy.install.version" value="2.3.0" />
     <condition property="ivy.home" value="${env.IVY_HOME}">
@@ -30,13 +39,13 @@
     <property name="ivy.home" value="${user.home}/.ant" />
     <property name="ivy.jar.dir" value="${ivy.home}/lib" />
     <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
-    <property name="ivy.lib.dir" value="${lib.dir}" />    
+    <property name="ivy.lib.dir" value="${lib.dir}" />
 
     <!-- Ivy download -->
     <target name="download-ivy" unless="offline">
         <mkdir dir="${ivy.jar.dir}"/>
-        <get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" 
-             dest="${ivy.jar.file}" usetimestamp="true" skipexisting="true"/>
+        <get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
+             dest="${ivy.jar.file}" usetimestamp="true"/>
     </target>
 
     <!-- Ivy initialisation -->
@@ -63,9 +72,9 @@
     <!-- Generate Javadocs -->
     <target name="docs" depends="build">
         <javadoc packagenames="src" sourcepath="${src.dir}" destdir="${build.javadoc.dir}">
-            <fileset dir="${src.dir}" includes="**"/>
+            <fileset dir="${src.dir}" includes="**/*.java"/>
         </javadoc>
-        
+
         <mkdir dir="${dist.dir}"/>
         <jar jarfile="${dist.dir}/${ant.project.name}-javadoc.jar" basedir="${build.javadoc.dir}"/>
     </target>
@@ -73,10 +82,12 @@
     <!-- Build distribution -->
     <target name="dist" depends="build,docs" description="generate distribution">
         <mkdir dir="${dist.dir}/lib"/>
-        <jar jarfile="${dist.dir}/${ant.project.name}.jar" basedir="${build.src.dir}">
+        <jar jarfile="${dist.dir}/${ant.project.name}.jar">
             <manifest>
-                <attribute name="Main-Class" value="${main.className}" />
+                <attribute name="Main-Class" value="${main.class}"/>
             </manifest>
+            <fileset dir="${build.src.dir}" />
+            <zipfileset dir="${src.dir}" excludes="**/*.java"/>
         </jar>
 
         <copy todir="${dist.dir}/lib">
@@ -87,7 +98,7 @@
         </copy>
     </target>
 
-    <!-- Build test classes -->    
+    <!-- Build test classes -->
     <target name="build-tests" depends="build" description="compile test source files">
         <javac srcdir="${test.dir}" destdir="${build.test.dir}" includeantruntime="false" debug="on">
             <classpath refid="default.classpath"/>
@@ -109,7 +120,7 @@
             </batchtest>
         </junit>
     </target>
-    
+
     <!-- Clean compiled files -->
     <target name="clean" description="clean up" >
         <delete dir="${build.dir}"/>
