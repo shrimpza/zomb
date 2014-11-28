@@ -49,9 +49,9 @@ public interface Query {
 	public List<String> args();
 
 	/**
-	 * The raw command, as requested by the user.
+	 * The "raw" query, as requested by the user.
 	 *
-	 * @return raw command
+	 * @return query string
 	 */
-	public String rawCommand();
+	public String query();
 }

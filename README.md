@@ -68,10 +68,12 @@ Responses take the following format:
 ## Plugin API
 
 The plugin API is largely the same as the client API, but somewhat simplified
-for ease of plugin implementation.
+for ease of plugin implementation. Each plugins is referenced via a unique URL.
 
-Plugins are referenced via a unique URL. A GET request to the URL should
-provide plugin information in the following format:
+### Plugin Definition
+
+A GET request to the plugin URL should provide plugin information in the
+following format:
 
 ```json
 {
@@ -110,6 +112,71 @@ provide plugin information in the following format:
    optional regular expression which can be applied to a query to validate it,
    prior to submitting to the plugin for execution.
 
+
+### Plugin Execution
+
+When ZOMB has determined that a specific plugin is responsible for executing
+a query issued by a user, a POST request will be made to the plugin URL, with
+the following body:
+
+```json
+{
+  "application": "unique-identifier",
+  "user": "jane",
+  "command": "command-name",
+  "args": ["arg1", "arg2"],
+  "query": "command-name arg1 arg2"
+}
+```
+
+- `application`<br/>
+  a unique identifier for an application. allows a plugin to identify requests
+  from the same application, without exposing any application information.
+- `user`<br/>
+  name of the user who issued the request.
+- `command`<br/>
+  name of the command requested, as parsed by ZOMB.
+- `args`<br/>
+  list of parsed argument strings, in order.
+- `query`<br/>
+  the original query, as made by the user, excluding the plugin name.
+
+The expected response is a simplified version of the Client API response:
+
+```json
+{
+  "response": [
+    "line 1",
+    "multi-line response line 2"
+  ],
+  "image": "path/to/image"
+}
+```
+
+- `response`<br/>
+  array of strings to display to the user. may be markdown formatted - clients
+  are expected to implement markdown processing appropriate to their interface.
+  plugins are encouraged to keep responses as simple as possible, and clients
+  should be assumed to have very simple output capabilities - for example CLI
+  or IRC.
+- `image`<br/>
+  optionally, an image may be returned which some clients may be able to make
+  use of; an image should never be the only expected output.
+
+
+### Reserved Names
+
+As the query language for plugins is also shared by ZOMB's internal functions,
+there are a few names which may not be used for either plugins or commands:
+
+A plugin may not be named any of the following:
+
+- plugin
+- help
+
+A plugin may not have a command named any of the following:
+
+- commands
 
 ## Usage
 
