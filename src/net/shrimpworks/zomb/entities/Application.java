@@ -8,31 +8,6 @@ package net.shrimpworks.zomb.entities;
  */
 public interface Application extends HasName {
 
-	public static Application newInstance(final String name, final String key, final String url, final String contact) {
-		return new Application() {
-
-			@Override
-			public String name() {
-				return name;
-			}
-
-			@Override
-			public String key() {
-				return key;
-			}
-
-			@Override
-			public String url() {
-				return url;
-			}
-
-			@Override
-			public String contact() {
-				return contact;
-			}
-		};
-	}
-
 	/**
 	 * Application name.
 	 *
