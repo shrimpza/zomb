@@ -7,7 +7,7 @@ import java.util.List;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -17,12 +17,24 @@ public class PluginRegistryTest {
 	public void pluginRegistryTest() {
 		PluginRegistry plugins = new PluginRegistryImpl();
 
+		Plugin pee1 = new PluginImpl("pee1", "help", null, "linky", "author@mail");
+		Plugin pee2 = new PluginImpl("pee2", "help2", null, "link2", "author@mail");
+
 		assertTrue(plugins.all().isEmpty());
 		assertNull(plugins.find("none"));
 
-		assertTrue(plugins.add(new PluginImpl("pee1", "help", null, "linky", "author@mail")));
-		assertNotNull(plugins.find("pee1"));
-		assertEquals("help", plugins.find("pee1").help());
+		assertTrue(plugins.add(pee1));
+		assertEquals(pee1, plugins.find("pee1"));
+		assertEquals(pee1.help(), plugins.find("pee1").help());
+
+		assertTrue(plugins.add(pee2));
+		assertEquals(pee2, plugins.find("pee2"));
+		assertNotEquals(plugins.find("pee1"), plugins.find("pee2"));
+
+		assertEquals(pee1, plugins.remove(pee1));
+
+		assertNull(plugins.find("pee1"));
+		assertEquals(pee2, plugins.find("pee2"));
 	}
 
 	public static class PluginRegistryImpl implements PluginRegistry {
