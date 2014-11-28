@@ -31,6 +31,8 @@ public class PluginRegistryTest {
 
 		assertNull(plugins.find("pee1"));
 		assertEquals(pee2, plugins.find("pee2"));
+
+		assertTrue(plugins.all().contains(pee2));
 	}
 
 }
