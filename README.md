@@ -88,6 +88,7 @@ following format:
       "pattern": "argument regex"
     }
   ]
+}
 ```
 
 - `plugin`<br/>
