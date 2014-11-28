@@ -1,7 +1,10 @@
 package net.shrimpworks.zomb.entities;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class ApplicationRegistryTest {
 
@@ -12,21 +15,23 @@ public class ApplicationRegistryTest {
 		Application app1 = new ApplicationImpl("app1", "abc", "url", "guy");
 		Application app2 = new ApplicationImpl("app2", "123", "earl", "person@mail");
 
-		Assert.assertTrue(reg.add(app1));
-		Assert.assertEquals(app1, reg.find("app1"));
-		Assert.assertEquals(app1, reg.forKey("abc"));
-		Assert.assertEquals(app1, reg.remove(app1));
-		Assert.assertNull(reg.remove(app1));
+		assertTrue(reg.add(app1));
+		assertEquals(app1, reg.find("app1"));
+		assertEquals(app1, reg.forKey("abc"));
+		assertEquals(app1, reg.remove(app1));
+		assertNull(reg.remove(app1));
+		assertNull(reg.find("app1"));
+		assertNull(reg.forKey("abc"));
 
-		Assert.assertTrue(reg.all().isEmpty());
+		assertTrue(reg.all().isEmpty());
 
-		Assert.assertTrue(reg.add(app1));
-		Assert.assertTrue(reg.add(app2));
+		assertTrue(reg.add(app1));
+		assertTrue(reg.add(app2));
 
-		Assert.assertTrue(reg.all().contains(app1));
-		Assert.assertTrue(reg.all().contains(app2));
+		assertTrue(reg.all().contains(app1));
+		assertTrue(reg.all().contains(app2));
 
-		Assert.assertEquals(app2, reg.find("app2"));
-		Assert.assertEquals(app2, reg.forKey("123"));
+		assertEquals(app2, reg.find("app2"));
+		assertEquals(app2, reg.forKey("123"));
 	}
 }
