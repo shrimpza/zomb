@@ -4,7 +4,7 @@ ZOMB provides an API-driven HTTP back-end for an IRC bot style command
 processor, where functionality is implemented in remotely-hosted HTTP based
 plugin services.
 
-# Client API
+## Client API
 
 Interaction with ZOMB is achieved by making HTTP POST requests to the root
 path.
@@ -13,7 +13,7 @@ Client applications are each provided a unique "API key", which provides both
 access control and organisation (one ZOMB instance may serve several clients,
 each with different configurations).
 
-## Request
+### Request
 
 Queries are in JSON format, and are structured as follows (the body of the
 POST request):
@@ -26,15 +26,15 @@ POST request):
 }
 ```
 
-- `key`
+- `key`<br/>
   the client application API key.
-- `user`
+- `user`<br/>
   name of the user who issued the query - it will be passed on to plugin
   services and may be used for statistics or response personalisation.
-- `query`
+- `query`<br/>
   the query as requested by the user.
 
-## Response
+### Response
 
 Responses take the following format:
 
@@ -51,21 +51,21 @@ Responses take the following format:
 }
 ```
 
-- `plugin`
+- `plugin`<br/>
   the name of the plugin which produced the response.
-- `user`
+- `user`<br/>
   user who originally issued the query.
-- `query`
+- `query`<br/>
   the original query string.
-- `response`
+- `response`<br/>
   array of strings to display to the user. may be markdown formatted - clients
   are expected to implement markdown processing appropriate to their interface.
-- `image`
+- `image`<br/>
   optionally, an image may be returned which some clients may be able to make
   use of.
 
 
-# Plugin API
+## Plugin API
 
 The plugin API is largely the same as the client API, but somewhat simplified
 for ease of plugin implementation.
@@ -77,7 +77,7 @@ provide plugin information in the following format:
 {
   "plugin": "plugin-name",
   "help": "plugin help string",
-  "contact": "you <you@mail>"
+  "contact": "you <you@mail>",
   "commands": [
     {
       "command": "command-name",
@@ -88,32 +88,32 @@ provide plugin information in the following format:
   ]
 ```
 
-- plugin
+- `plugin`<br/>
   unique plugin name.
-- help
+- `help`<br/>
   a brief help string describing what the plugin is and does, optionally
   markdown formatted.
-- contact
+- `contact`<br/>
   plugin author contact information.
-- commands
+- `commands`<br/>
   a list of commands exposed by this plugin.
- - command
+ - `command`<br/>
    the command name.
- - help
+ - `help`<br/>
    short help description for this specific command, optionally markdown
    formatted.
- - args
+ - `args`<br/>
    number of arguments this command expects - allows ZOMB to pre-validate query
    input prior to submitting it to the plugin for execution. a value of 0 will
    not perform validation (allows any number of arguments, including none)
- - pattern
+ - `pattern`<br/>
    optional regular expression which can be applied to a query to validate it,
    prior to submitting to the plugin for execution.
 
 
-# Usage
+## Usage
 
-## Plugin Management
+### Plugin Management
 
 In order for ZOMB to be useful, plugins must be added. Plugins implement
 the actual functionality ZOMB provides.
@@ -123,40 +123,28 @@ normal usage.
 
 Add a plugin:
 
-```
-  plugin add http://url.to/plugin/script
-```
+```plugin add http://url.to/plugin/script```
 
 Remove a plugin:
 
-```
-  plugin remove plugin-name
-```
+```plugin remove plugin-name```
 
-## Help And Information
+### Help And Information
 
 
 List available plugins:
 
-```
-  plugin list
-```
+```plugin list```
 
 Plugins are expected to provide a brief help blurb, which can be accessed as
 follows:
 
-```
-  help plugin-name
-```
+```help plugin-name```
 
 See the available commands a plugin provides:
 
-```
-  help plugin-name commands
-```
+```help plugin-name commands```
 
 To access help for a specific command:
 
-```
-  help plugin-name command-name
-```
+```help plugin-name command-name```
