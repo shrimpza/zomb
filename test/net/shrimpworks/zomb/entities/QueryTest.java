@@ -9,7 +9,8 @@ import java.util.regex.Pattern;
 import net.shrimpworks.zomb.entities.application.Application;
 import net.shrimpworks.zomb.entities.application.ApplicationImpl;
 import net.shrimpworks.zomb.entities.plugin.Command;
-import net.shrimpworks.zomb.entities.plugin.CommandRegistry;
+import net.shrimpworks.zomb.entities.plugin.CommandImpl;
+import net.shrimpworks.zomb.entities.plugin.CommandRegistryImpl;
 import net.shrimpworks.zomb.entities.plugin.Plugin;
 import net.shrimpworks.zomb.entities.plugin.PluginImpl;
 import net.shrimpworks.zomb.entities.user.User;
@@ -118,41 +119,4 @@ public class QueryTest {
 		}
 	}
 
-	public class CommandRegistryImpl extends AbstractRegistry<Command> implements CommandRegistry {
-	}
-
-	public static class CommandImpl implements Command {
-
-		private final String name;
-		private final String help;
-		private final int args;
-		private final Pattern pattern;
-
-		public CommandImpl(String name, String help, int args, String pattern) {
-			this.name = name;
-			this.help = help;
-			this.args = args;
-			this.pattern = pattern != null && !pattern.isEmpty() ? Pattern.compile(pattern) : null;
-		}
-
-		@Override
-		public String name() {
-			return name;
-		}
-
-		@Override
-		public String help() {
-			return help;
-		}
-
-		@Override
-		public int arguments() {
-			return args;
-		}
-
-		@Override
-		public Pattern pattern() {
-			return pattern;
-		}
-	}
 }
