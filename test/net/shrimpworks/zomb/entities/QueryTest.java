@@ -3,6 +3,7 @@ package net.shrimpworks.zomb.entities;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.shrimpworks.zomb.entities.application.Application;
@@ -56,11 +57,13 @@ public class QueryTest {
 			this.user = user;
 			this.query = query;
 
-			// TODO parse query
+			List<String> queryParts = queryParts(query);
 
-			this.plugin = application.plugins().find("PARSED-PLUGIN"); // TODO
-			this.command = this.plugin.commands().find("PARSED-COMMAND"); // TODO
-			this.args = new ArrayList<>(); // TODO
+			if (queryParts.size() < 2) throw new IllegalArgumentException("Invalid query string");
+
+			this.plugin = application.plugins().find(queryParts.remove(0));
+			this.command = this.plugin.commands().find(queryParts.remove(0));
+			this.args = queryParts;
 		}
 
 		@Override
@@ -91,6 +94,27 @@ public class QueryTest {
 		@Override
 		public String query() {
 			return query;
+		}
+
+		private List<String> queryParts(String query) {
+			List<String> res = new ArrayList<>();
+			Pattern regex = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
+			Matcher regexMatcher = regex.matcher(query);
+
+			while (regexMatcher.find()) {
+				if (regexMatcher.group(1) != null) {
+					// Add double-quoted string without the quotes
+					res.add(regexMatcher.group(1));
+				} else if (regexMatcher.group(2) != null) {
+					// Add single-quoted string without the quotes
+					res.add(regexMatcher.group(2));
+				} else {
+					// Add unquoted word
+					res.add(regexMatcher.group());
+				}
+			}
+
+			return res;
 		}
 	}
 
