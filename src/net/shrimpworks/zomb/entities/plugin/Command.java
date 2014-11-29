@@ -1,4 +1,8 @@
-package net.shrimpworks.zomb.entities;
+package net.shrimpworks.zomb.entities.plugin;
+
+import java.util.regex.Pattern;
+
+import net.shrimpworks.zomb.entities.HasName;
 
 /**
  * A command is an individual instruction which may be issued to a
@@ -41,5 +45,5 @@ public interface Command extends HasName {
 	 *
 	 * @return optional argument regular expression.
 	 */
-	public String pattern();
+	public Pattern pattern();
 }

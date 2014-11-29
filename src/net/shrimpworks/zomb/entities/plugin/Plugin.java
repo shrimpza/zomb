@@ -1,6 +1,5 @@
 package net.shrimpworks.zomb.entities.plugin;
 
-import net.shrimpworks.zomb.entities.CommandRegistry;
 import net.shrimpworks.zomb.entities.HasName;
 
 /**

@@ -1,7 +1,5 @@
 package net.shrimpworks.zomb.entities.plugin;
 
-import net.shrimpworks.zomb.entities.CommandRegistry;
-
 public class PluginImpl implements Plugin {
 
 	private final String name;
