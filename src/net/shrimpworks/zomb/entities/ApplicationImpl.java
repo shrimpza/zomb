@@ -1,9 +1,5 @@
 package net.shrimpworks.zomb.entities;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 public class ApplicationImpl implements Application {
 
 	private final String name;
@@ -11,10 +7,10 @@ public class ApplicationImpl implements Application {
 	private final String url;
 	private final String contact;
 	private final PluginRegistry pluginRegistry;
-	private final Set<User> users;
+	private final UserRegistry users;
 
 	public ApplicationImpl(String name, String key, String url, String contact, PluginRegistry pluginRegistry,
-						   Set<User> users) {
+						   UserRegistry users) {
 		this.name = name;
 		this.key = key;
 		this.url = url;
@@ -24,7 +20,7 @@ public class ApplicationImpl implements Application {
 	}
 
 	public ApplicationImpl(String name, String key, String url, String contact) {
-		this(name, key, url, contact, new PluginRegistryImpl(), new HashSet<>());
+		this(name, key, url, contact, new PluginRegistryImpl(), new UserRegistryImpl());
 	}
 
 	@Override
@@ -53,7 +49,7 @@ public class ApplicationImpl implements Application {
 	}
 
 	@Override
-	public Set<User> users() {
-		return Collections.unmodifiableSet(users);
+	public UserRegistry users() {
+		return users;
 	}
 }
