@@ -3,6 +3,7 @@ package net.shrimpworks.zomb.entities;
 import java.util.List;
 
 import net.shrimpworks.zomb.entities.application.Application;
+import net.shrimpworks.zomb.entities.plugin.Command;
 import net.shrimpworks.zomb.entities.plugin.Plugin;
 import net.shrimpworks.zomb.entities.user.User;
 
@@ -39,11 +40,11 @@ public interface Query {
 	public Plugin plugin();
 
 	/**
-	 * Parsed single-word command.
+	 * Plugin command identified for this query.
 	 *
 	 * @return command
 	 */
-	public String command();
+	public Command command();
 
 	/**
 	 * Parsed list of command arguments.
