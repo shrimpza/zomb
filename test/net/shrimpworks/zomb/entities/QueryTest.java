@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import net.shrimpworks.zomb.entities.application.Application;
 import net.shrimpworks.zomb.entities.application.ApplicationImpl;
 import net.shrimpworks.zomb.entities.plugin.Command;
-import net.shrimpworks.zomb.entities.plugin.CommandRegistryImpl;
+import net.shrimpworks.zomb.entities.plugin.CommandRegistry;
 import net.shrimpworks.zomb.entities.plugin.Plugin;
 import net.shrimpworks.zomb.entities.plugin.PluginImpl;
 import net.shrimpworks.zomb.entities.user.User;
@@ -92,6 +92,9 @@ public class QueryTest {
 		public String query() {
 			return query;
 		}
+	}
+
+	public class CommandRegistryImpl extends AbstractRegistry<Command> implements CommandRegistry {
 	}
 
 	public static class CommandImpl implements Command {
