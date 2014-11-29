@@ -13,11 +13,4 @@ public interface User extends HasName {
 	 */
 	@Override
 	public String name();
-
-	/**
-	 * Application from whence this user originates.
-	 *
-	 * @return application instance
-	 */
-	public Application application();
 }

@@ -1,5 +1,7 @@
 package net.shrimpworks.zomb.entities;
 
+import java.util.Set;
+
 /**
  * An Application represents an external producer of query messages.
  * <p>
@@ -37,4 +39,18 @@ public interface Application extends HasName {
 	 * @return author contact
 	 */
 	public String contact();
+
+	/**
+	 * All active plugins associated with this application.
+	 *
+	 * @return plugin registry
+	 */
+	public PluginRegistry plugins();
+
+	/**
+	 * All users who have used this application.
+	 *
+	 * @return user collection
+	 */
+	public Set<User> users();
 }
