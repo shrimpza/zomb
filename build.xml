@@ -122,7 +122,8 @@
         </junit>
     </target>
 
-    <target name="test" depends="run-tests" description="run junit tests, reporting an error code on failure">
+	<!-- Run tests, exiting with status code 1 on error, or 2 on test failure -->
+    <target name="test" depends="run-tests" description="run junit tests, and fail the build on error or failure">
 		<fail if="tests.errors" message="Error encountered while executing tests" status="1"/>
 		<fail if="tests.failures" message="Tests failed" status="2"/>
     </target>
