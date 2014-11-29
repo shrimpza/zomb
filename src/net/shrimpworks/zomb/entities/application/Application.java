@@ -1,4 +1,8 @@
-package net.shrimpworks.zomb.entities;
+package net.shrimpworks.zomb.entities.application;
+
+import net.shrimpworks.zomb.entities.HasName;
+import net.shrimpworks.zomb.entities.plugin.PluginRegistry;
+import net.shrimpworks.zomb.entities.user.UserRegistry;
 
 /**
  * An Application represents an external producer of query messages.

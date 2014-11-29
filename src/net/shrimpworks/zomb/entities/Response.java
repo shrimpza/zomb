@@ -1,5 +1,8 @@
 package net.shrimpworks.zomb.entities;
 
+import net.shrimpworks.zomb.entities.plugin.Plugin;
+import net.shrimpworks.zomb.entities.user.User;
+
 /**
  * A response reveived from a plugin.
  */

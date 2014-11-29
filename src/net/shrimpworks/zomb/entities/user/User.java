@@ -1,4 +1,6 @@
-package net.shrimpworks.zomb.entities;
+package net.shrimpworks.zomb.entities.user;
+
+import net.shrimpworks.zomb.entities.HasName;
 
 /**
  *

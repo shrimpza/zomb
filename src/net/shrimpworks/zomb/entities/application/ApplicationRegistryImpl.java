@@ -1,4 +1,4 @@
-package net.shrimpworks.zomb.entities;
+package net.shrimpworks.zomb.entities.application;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,4 +1,9 @@
-package net.shrimpworks.zomb.entities;
+package net.shrimpworks.zomb.entities.application;
+
+import net.shrimpworks.zomb.entities.plugin.PluginRegistry;
+import net.shrimpworks.zomb.entities.plugin.PluginRegistryImpl;
+import net.shrimpworks.zomb.entities.user.UserRegistry;
+import net.shrimpworks.zomb.entities.user.UserRegistryImpl;
 
 public class ApplicationImpl implements Application {
 

@@ -2,6 +2,10 @@ package net.shrimpworks.zomb.entities;
 
 import java.util.List;
 
+import net.shrimpworks.zomb.entities.application.Application;
+import net.shrimpworks.zomb.entities.plugin.Plugin;
+import net.shrimpworks.zomb.entities.user.User;
+
 /**
  * Represents a query to be processed by a plugin.
  * <p>

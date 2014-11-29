@@ -1,4 +1,6 @@
-package net.shrimpworks.zomb.entities;
+package net.shrimpworks.zomb.entities.application;
+
+import net.shrimpworks.zomb.entities.Registry;
 
 public interface ApplicationRegistry extends Registry<Application> {
 

@@ -1,4 +1,7 @@
-package net.shrimpworks.zomb.entities;
+package net.shrimpworks.zomb.entities.plugin;
+
+import net.shrimpworks.zomb.entities.CommandRegistry;
+import net.shrimpworks.zomb.entities.HasName;
 
 /**
  * Plugins implement the actual functionality of the system.

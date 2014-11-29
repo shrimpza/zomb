@@ -2,7 +2,7 @@ package net.shrimpworks.zomb.entities;
 
 /**
  * A command is an individual instruction which may be issued to a
- * {@link Plugin}.
+ * {@link net.shrimpworks.zomb.entities.plugin.Plugin}.
  * <p>
  * For example, the plugin named "math" might have a command "sum", executed as
  * follows:
@@ -14,7 +14,7 @@ public interface Command extends HasName {
 
 	/**
 	 * The command name. This is expected to be the second parameter of a user
-	 * query, following the {@link Plugin} name.
+	 * query, following the {@link net.shrimpworks.zomb.entities.plugin.Plugin} name.
 	 *
 	 * @return command name
 	 */

@@ -1,4 +1,4 @@
-package net.shrimpworks.zomb.entities;
+package net.shrimpworks.zomb.entities.plugin;
 
 import org.junit.Test;
 
