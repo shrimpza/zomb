@@ -1,9 +1,7 @@
 package net.shrimpworks.zomb.entities;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public abstract class AbstractRegistry<T extends HasName> implements Registry<T> {
@@ -35,7 +33,7 @@ public abstract class AbstractRegistry<T extends HasName> implements Registry<T>
 	}
 
 	@Override
-	public List<T> all() {
-		return Collections.unmodifiableList(new ArrayList<>(entities));
+	public Set<T> all() {
+		return Collections.unmodifiableSet(entities);
 	}
 }

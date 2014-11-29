@@ -1,6 +1,6 @@
 package net.shrimpworks.zomb.entities;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * The Registry is responsible for holding and managing all registered entities.
@@ -35,11 +35,8 @@ public interface Registry<T extends HasName> {
 
 	/**
 	 * Get all entities within this registry.
-	 * <p>
-	 * List type is used, since ordering may be important for certain
-	 * implementations.
 	 *
 	 * @return all entities
 	 */
-	public List<T> all();
+	public Set<T> all();
 }
