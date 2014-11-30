@@ -5,6 +5,8 @@ import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
@@ -20,6 +22,8 @@ import net.shrimpworks.zomb.entities.user.User;
 import net.shrimpworks.zomb.entities.user.UserImpl;
 
 public class ClientAPIServiceImpl implements ClientAPIService {
+
+	private static final Logger logger = Logger.getLogger(ClientAPIServiceImpl.class.getName());
 
 	private final HttpServer httpServer;
 	private final ApplicationRegistry appRegistry;
@@ -62,7 +66,7 @@ public class ClientAPIServiceImpl implements ClientAPIService {
 					}
 
 					User user = application.users().find(req.get("user").asString());
-					if (user == null) application.users().add(new UserImpl(req.get("user").asString()));
+					if (user == null) application.users().add(user = new UserImpl(req.get("user").asString()));
 
 					try {
 						Query query = new QueryImpl(application, user, req.get("query").asString());
@@ -75,7 +79,7 @@ public class ClientAPIServiceImpl implements ClientAPIService {
 						}
 
 						if (response != null) {
-							String jsonResponse = jsonResponse(response).asString();
+							String jsonResponse = jsonResponse(response).toString();
 							httpExchange.sendResponseHeaders(200, jsonResponse.length());
 							httpExchange.getResponseBody().write(jsonResponse.getBytes());
 						} else {
@@ -83,11 +87,15 @@ public class ClientAPIServiceImpl implements ClientAPIService {
 						}
 
 					} catch (IllegalArgumentException e) {
+						logger.log(Level.INFO, e.getMessage(), e);
+
 						httpExchange.sendResponseHeaders(400, -1); // bas request - invalid query
 					}
 				}
 			} catch (Throwable t) {
 				// HttpServer does not behave well when exceptions are thrown in handlers
+				logger.log(Level.WARNING, t.getMessage(), t);
+
 				httpExchange.sendResponseHeaders(500, -1);
 			}
 		}
@@ -103,7 +111,7 @@ public class ClientAPIServiceImpl implements ClientAPIService {
 					.add("user", response.user().name())
 					.add("query", response.query())
 					.add("response", resStrings)
-					.add("image", response.image());
+					.add("image", response.image() == null ? "" : response.image());
 		}
 	}
 }
