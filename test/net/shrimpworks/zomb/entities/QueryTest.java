@@ -131,23 +131,24 @@ public class QueryTest {
 
 			List<String> queryParts = queryParts(query);
 
-			if (queryParts.size() < 2) throw new IllegalArgumentException("Invalid query string");
+			if (queryParts.size() < 2)
+				throw new IllegalArgumentException("Invalid query: cannot determine plugin and command");
 
 			this.plugin = application.plugins().find(queryParts.remove(0));
-			if (this.plugin == null) throw new IllegalArgumentException("Invalid query, plugin not found");
+			if (this.plugin == null) throw new IllegalArgumentException("Invalid query: plugin not found");
 
 			this.command = this.plugin.commands().find(queryParts.remove(0));
-			if (this.command == null) throw new IllegalArgumentException("Invalid query, command not found");
+			if (this.command == null) throw new IllegalArgumentException("Invalid query: command not found");
 
 			if (this.command.pattern() != null) {
 				String queryString = query.replaceFirst(this.plugin.name() + " " + this.command.name() + " ", "");
 				if (!queryString.matches(this.command.pattern().pattern()))
-					throw new IllegalArgumentException("Invalid query string, query does not match required format");
+					throw new IllegalArgumentException("Invalid query: query does not match required format, see command help");
 
 				this.args = Collections.singletonList(queryString);
 			} else {
 				if (this.command.arguments() > 0 && queryParts.size() != this.command.arguments())
-					throw new IllegalArgumentException("Invalid query string, too many arguments");
+					throw new IllegalArgumentException("Invalid query: too many arguments, see command help");
 
 				this.args = queryParts;
 			}
