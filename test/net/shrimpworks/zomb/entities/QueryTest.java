@@ -32,6 +32,7 @@ public class QueryTest {
 		app.plugins().add(new PluginImpl("weather", null, new CommandRegistryImpl(), null, null));
 		app.plugins().find("weather").commands().add(new CommandImpl("current", null, 1, null));
 		app.plugins().find("weather").commands().add(new CommandImpl("tomorrow", null, 1, null));
+		app.plugins().find("weather").commands().add(new CommandImpl("saturday", null, 0, "[a-zA-Z]+, [A-Z]{2}"));
 		app.users().add(new UserImpl("bob"));
 	}
 
@@ -53,7 +54,7 @@ public class QueryTest {
 	}
 
 	@Test
-	public void invalidQueryTest() {
+	public void argumentCountTest() {
 		// plugin: weather
 		// command: tomorrow
 		// args[0]: johannesburg south africa
@@ -70,6 +71,27 @@ public class QueryTest {
 		Query query = new QueryImpl(app, app.users().find("bob"), q);
 
 		assertEquals(app.plugins().find("weather").commands().find("tomorrow"), query.command());
+		assertEquals(1, query.args().size());
+	}
+
+	@Test
+	public void argumentPatternTest() {
+		// plugin: weather
+		// command: saturday
+		// args[0]: johannesburg, ZA
+		String q = "weather saturday johannesburg, south africa";
+
+		try {
+			new QueryImpl(app, app.users().find("bob"), q);
+			fail("Query parsing should fail (pattern mismatch)");
+		} catch (IllegalArgumentException expected) {
+			// expected
+		}
+
+		q = "weather saturday johannesburg, ZA";
+		Query query = new QueryImpl(app, app.users().find("bob"), q);
+
+		assertEquals(app.plugins().find("weather").commands().find("saturday"), query.command());
 		assertEquals(1, query.args().size());
 	}
 
@@ -94,10 +116,19 @@ public class QueryTest {
 			this.plugin = application.plugins().find(queryParts.remove(0));
 			this.command = this.plugin.commands().find(queryParts.remove(0));
 
-			if (this.command.arguments() > 0 && queryParts.size() != this.command.arguments())
-				throw new IllegalArgumentException("Invalid query string, too many arguments");
 
-			this.args = queryParts;
+			if (this.command.pattern() != null) {
+				String queryString = query.replaceFirst(this.plugin.name() + " " + this.command.name() + " ", "");
+				if (!queryString.matches(this.command.pattern().pattern()))
+					throw new IllegalArgumentException("Invalid query string, query does not match required format");
+
+				this.args = Collections.singletonList(queryString);
+			} else {
+				if (this.command.arguments() > 0 && queryParts.size() != this.command.arguments())
+					throw new IllegalArgumentException("Invalid query string, too many arguments");
+
+				this.args = queryParts;
+			}
 		}
 
 		@Override
