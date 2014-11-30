@@ -4,7 +4,7 @@ import net.shrimpworks.zomb.entities.plugin.Plugin;
 import net.shrimpworks.zomb.entities.user.User;
 
 /**
- * A response reveived from a plugin.
+ * A response received from a plugin.
  */
 public interface Response {
 
