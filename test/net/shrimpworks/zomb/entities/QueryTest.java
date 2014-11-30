@@ -95,6 +95,26 @@ public class QueryTest {
 		assertEquals(1, query.args().size());
 	}
 
+	@Test
+	public void pluginCommandValidationTest() {
+		String q = "math add 1 1";
+
+		try {
+			new QueryImpl(app, app.users().find("bob"), q);
+			fail("Query parsing should fail (no plugin named math)");
+		} catch (IllegalArgumentException expected) {
+			// expected
+		}
+
+		q = "weather yesterday johannesburg";
+		try {
+			new QueryImpl(app, app.users().find("bob"), q);
+			fail("Query parsing should fail (no command named yesterday)");
+		} catch (IllegalArgumentException expected) {
+			// expected
+		}
+	}
+
 	public static class QueryImpl implements Query {
 
 		private final Application application;
@@ -114,8 +134,10 @@ public class QueryTest {
 			if (queryParts.size() < 2) throw new IllegalArgumentException("Invalid query string");
 
 			this.plugin = application.plugins().find(queryParts.remove(0));
-			this.command = this.plugin.commands().find(queryParts.remove(0));
+			if (this.plugin == null) throw new IllegalArgumentException("Invalid query, plugin not found");
 
+			this.command = this.plugin.commands().find(queryParts.remove(0));
+			if (this.command == null) throw new IllegalArgumentException("Invalid query, command not found");
 
 			if (this.command.pattern() != null) {
 				String queryString = query.replaceFirst(this.plugin.name() + " " + this.command.name() + " ", "");
