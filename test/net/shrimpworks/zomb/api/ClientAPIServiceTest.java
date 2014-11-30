@@ -2,12 +2,13 @@ package net.shrimpworks.zomb.api;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
+import com.eclipsesource.json.JsonObject;
 import net.shrimpworks.zomb.common.HttpClient;
 import net.shrimpworks.zomb.entities.Query;
 import net.shrimpworks.zomb.entities.Response;
-import net.shrimpworks.zomb.entities.application.Application;
 import net.shrimpworks.zomb.entities.application.ApplicationImpl;
 import net.shrimpworks.zomb.entities.application.ApplicationRegistry;
 import net.shrimpworks.zomb.entities.application.ApplicationRegistryImpl;
@@ -15,11 +16,13 @@ import net.shrimpworks.zomb.entities.plugin.CommandImpl;
 import net.shrimpworks.zomb.entities.plugin.CommandRegistryImpl;
 import net.shrimpworks.zomb.entities.plugin.Plugin;
 import net.shrimpworks.zomb.entities.plugin.PluginImpl;
+import net.shrimpworks.zomb.entities.user.User;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -73,8 +76,12 @@ public class ClientAPIServiceTest {
 				"  \"query\": \"plugin list\"" +
 				"}");
 
-		assertTrue(pluginList.contains("plugin"));
-		assertTrue(pluginList.contains("help"));
+		JsonObject json = JsonObject.readFrom(pluginList);
+
+		assertEquals("jane", json.get("user").asString());
+		assertEquals("plugin", json.get("plugin").asString());
+		assertTrue(json.get("response").asArray().get(0).asString().contains("plugin"));
+		assertTrue(json.get("response").asArray().get(0).asString().contains("help"));
 	}
 
 	public static class PluginManager extends PluginImpl {
@@ -98,7 +105,7 @@ public class ClientAPIServiceTest {
 		public Response execute(Query query) {
 			switch (query.command().name()) {
 				case "list":
-					return list(query.application());
+					return list(query);
 				case "add":
 					return add(query);
 				case "remove":
@@ -108,8 +115,17 @@ public class ClientAPIServiceTest {
 			}
 		}
 
-		private Response list(Application application) {
-			return null;
+		private Response list(Query query) {
+			StringBuilder sb = new StringBuilder();
+			Iterator<Plugin> plugins = query.application().plugins().all().iterator();
+			while (plugins.hasNext()) {
+				sb.append(plugins.next().name());
+				if (plugins.hasNext()) {
+					sb.append(", ");
+				}
+			}
+
+			return new ResponseImpl(query.plugin(), query.user(), query.query(), new String[]{sb.toString()}, null);
 		}
 
 		private Response add(Query query) {
@@ -144,6 +160,48 @@ public class ClientAPIServiceTest {
 		@Override
 		public Response execute(Query query) {
 			throw new UnsupportedOperationException("Method not implemented.");
+		}
+	}
+
+	public static class ResponseImpl implements Response {
+
+		private final Plugin plugin;
+		private final User user;
+		private final String query;
+		private final String[] response;
+		private final String image;
+
+		public ResponseImpl(Plugin plugin, User user, String query, String[] response, String image) {
+			this.plugin = plugin;
+			this.user = user;
+			this.query = query;
+			this.response = response;
+			this.image = image;
+		}
+
+		@Override
+		public Plugin plugin() {
+			return plugin;
+		}
+
+		@Override
+		public User user() {
+			return user;
+		}
+
+		@Override
+		public String query() {
+			return query;
+		}
+
+		@Override
+		public String[] response() {
+			return response.clone();
+		}
+
+		@Override
+		public String image() {
+			return image;
 		}
 	}
 }
