@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.3">
-    <info organisation="org.apache" module="${ant.project.name}"/>
+	<info organisation="org.apache" module="${ant.project.name}"/>
 
-    <configurations>
-        <conf name="default" />
-        <conf name="test" extends="default"/>
-    </configurations>
+	<configurations>
+		<conf name="default"/>
+		<conf name="test" extends="default"/>
+	</configurations>
 
-    <dependencies>
-        <dependency org="junit" name="junit" rev="4.11" conf="test->default"/>
-        <dependency org="net.jadler" name="jadler-all" rev="1.1.1" conf="test->default"/>
-    </dependencies>
+	<dependencies>
+		<dependency org="com.eclipsesource.minimal-json" name="minimal-json" rev="0.9.+" conf="default"/>
+
+		<dependency org="junit" name="junit" rev="4.11" conf="test->default"/>
+		<dependency org="net.jadler" name="jadler-all" rev="1.1.1" conf="test->default"/>
+	</dependencies>
 </ivy-module>
