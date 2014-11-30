@@ -112,7 +112,8 @@ following format:
    not perform validation (allows any number of arguments, including none)
  - `pattern`<br/>
    optional regular expression which can be applied to a query to validate it,
-   prior to submitting to the plugin for execution.
+   prior to submitting to the plugin for execution. if set, the args property
+   will be ignored and the pattern applied to the entire query.
 
 
 ### Plugin Execution
