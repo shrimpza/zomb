@@ -5,6 +5,7 @@ ZOMB provides an API-driven HTTP back-end for an IRC bot style command
 processor, where functionality is implemented in remotely-hosted HTTP based
 plugin services.
 
+
 ## Client API
 
 Interaction with ZOMB is achieved by making HTTP POST requests to the root
@@ -13,6 +14,7 @@ path.
 Client applications are each provided a unique "API key", which provides both
 access control and organisation (one ZOMB instance may serve several clients,
 each with different configurations).
+
 
 ### Request
 
@@ -34,6 +36,7 @@ POST request):
   services and may be used for statistics or response personalisation.
 - `query`<br/>
   the query as requested by the user.
+
 
 ### Response
 
@@ -70,6 +73,7 @@ Responses take the following format:
 
 The plugin API is largely the same as the client API, but somewhat simplified
 for ease of plugin implementation. Each plugins is referenced via a unique URL.
+
 
 ### Plugin Definition
 
@@ -181,6 +185,7 @@ A plugin may not have a command named any of the following:
 
 - commands
 
+
 ## Usage
 
 ### Plugin Management
@@ -200,7 +205,6 @@ Remove a plugin:
 ```plugin remove plugin-name```
 
 ### Help And Information
-
 
 List available plugins:
 
