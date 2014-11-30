@@ -16,11 +16,24 @@ import net.shrimpworks.zomb.entities.plugin.PluginImpl;
 import net.shrimpworks.zomb.entities.user.User;
 import net.shrimpworks.zomb.entities.user.UserImpl;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class QueryTest {
+
+	private Application app;
+
+	@Before
+	public void setup() {
+		app = new ApplicationImpl("app", "abc", null, null);
+		app.plugins().add(new PluginImpl("weather", null, new CommandRegistryImpl(), null, null));
+		app.plugins().find("weather").commands().add(new CommandImpl("current", null, 1, null));
+		app.plugins().find("weather").commands().add(new CommandImpl("tomorrow", null, 1, null));
+		app.users().add(new UserImpl("bob"));
+	}
 
 	@Test
 	public void queryTest() {
@@ -28,11 +41,6 @@ public class QueryTest {
 		// command: current
 		// args[0]: johannesburg
 		String q = "weather current johannesburg";
-
-		Application app = new ApplicationImpl("app", "abc", null, null);
-		app.plugins().add(new PluginImpl("weather", null, new CommandRegistryImpl(), null, null));
-		app.plugins().find("weather").commands().add(new CommandImpl("current", null, 1, null));
-		app.users().add(new UserImpl("bob"));
 
 		Query query = new QueryImpl(app, app.users().find("bob"), q);
 
@@ -42,6 +50,27 @@ public class QueryTest {
 		assertEquals(app.plugins().find("weather").commands().find("current"), query.command());
 		assertEquals(1, query.args().size());
 		assertEquals("johannesburg", query.args().get(0));
+	}
+
+	@Test
+	public void invalidQueryTest() {
+		// plugin: weather
+		// command: tomorrow
+		// args[0]: johannesburg south africa
+		String q = "weather tomorrow johannesburg south africa";
+
+		try {
+			new QueryImpl(app, app.users().find("bob"), q);
+			fail("Query parsing should fail (too many arguments)");
+		} catch (IllegalArgumentException expected) {
+			// expected
+		}
+
+		q = "weather tomorrow \"johannesburg south africa\"";
+		Query query = new QueryImpl(app, app.users().find("bob"), q);
+
+		assertEquals(app.plugins().find("weather").commands().find("tomorrow"), query.command());
+		assertEquals(1, query.args().size());
 	}
 
 	public static class QueryImpl implements Query {
@@ -64,6 +93,10 @@ public class QueryTest {
 
 			this.plugin = application.plugins().find(queryParts.remove(0));
 			this.command = this.plugin.commands().find(queryParts.remove(0));
+
+			if (this.command.arguments() > 0 && queryParts.size() != this.command.arguments())
+				throw new IllegalArgumentException("Invalid query string, too many arguments");
+
 			this.args = queryParts;
 		}
 
