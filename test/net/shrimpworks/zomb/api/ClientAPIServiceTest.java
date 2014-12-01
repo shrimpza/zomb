@@ -12,6 +12,7 @@ import net.shrimpworks.zomb.entities.Response;
 import net.shrimpworks.zomb.entities.application.ApplicationImpl;
 import net.shrimpworks.zomb.entities.application.ApplicationRegistry;
 import net.shrimpworks.zomb.entities.application.ApplicationRegistryImpl;
+import net.shrimpworks.zomb.entities.plugin.Command;
 import net.shrimpworks.zomb.entities.plugin.CommandImpl;
 import net.shrimpworks.zomb.entities.plugin.CommandRegistryImpl;
 import net.shrimpworks.zomb.entities.plugin.Plugin;
@@ -100,7 +101,7 @@ public class ClientAPIServiceTest {
 		json = JsonObject.readFrom(pluginHelp);
 
 		assertEquals("jane", json.get("user").asString());
-		assertEquals("plugin", json.get("help").asString());
+		assertEquals("help", json.get("plugin").asString());
 		assertTrue(json.get("response").asArray().get(0).asString().equals("Provides plugin management functionality"));
 
 
@@ -117,7 +118,7 @@ public class ClientAPIServiceTest {
 		json = JsonObject.readFrom(pluginCmdList);
 
 		assertEquals("jane", json.get("user").asString());
-		assertEquals("plugin", json.get("help").asString());
+		assertEquals("help", json.get("plugin").asString());
 		assertTrue(json.get("response").asArray().get(0).asString().contains("list"));
 		assertTrue(json.get("response").asArray().get(0).asString().contains("add"));
 		assertTrue(json.get("response").asArray().get(0).asString().contains("remove"));
@@ -194,7 +195,36 @@ public class ClientAPIServiceTest {
 
 		@Override
 		public Response execute(Query query) {
-			throw new UnsupportedOperationException("Method not implemented.");
+			switch (query.command().name()) {
+				case "show":
+					return show(query);
+				case "list":
+					return list(query);
+				default:
+					throw new IllegalArgumentException("Unknown plugin command");
+			}
+		}
+
+		private Response show(Query query) {
+			if (query.args().size() > 1) throw new UnsupportedOperationException("Not implemented"); // TODO
+
+			Plugin plugin = query.application().plugins().find(query.args().get(0));
+			return new ResponseImpl(query.plugin(), query.user(), query.query(), new String[]{plugin.help()}, null);
+		}
+
+		private Response list(Query query) {
+			Plugin plugin = query.application().plugins().find(query.args().get(0));
+
+			StringBuilder sb = new StringBuilder();
+			Iterator<Command> commands = plugin.commands().all().iterator();
+			while (commands.hasNext()) {
+				sb.append(commands.next().name());
+				if (commands.hasNext()) {
+					sb.append(", ");
+				}
+			}
+
+			return new ResponseImpl(query.plugin(), query.user(), query.query(), new String[]{sb.toString()}, null);
 		}
 	}
 
