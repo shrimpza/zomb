@@ -1,6 +1,5 @@
 package net.shrimpworks.zomb.entities;
 
-import net.shrimpworks.zomb.entities.Response;
 import net.shrimpworks.zomb.entities.plugin.Plugin;
 import net.shrimpworks.zomb.entities.user.User;
 
@@ -11,6 +10,10 @@ public class ResponseImpl implements Response {
 	private final String query;
 	private final String[] response;
 	private final String image;
+
+	public ResponseImpl(Query query, String[] response, String image) {
+		this(query.plugin(), query.user(), query.query(), response, image);
+	}
 
 	public ResponseImpl(Plugin plugin, User user, String query, String[] response, String image) {
 		this.plugin = plugin;
