@@ -63,6 +63,8 @@ public class ApplicationPersistenceTest {
 		assertNotNull(app.plugins().find("weather"));
 		assertNotNull(app.plugins().find("math"));
 
+		assertEquals("joe@mail", app.plugins().find("weather").contact());
+
 		assertNotNull(app.plugins().find("weather").commands().find("current"));
 	}
 
@@ -79,7 +81,7 @@ public class ApplicationPersistenceTest {
 		@Override
 		public boolean save(Application entity) throws IOException {
 			try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(path.resolve(entity.key()).toFile()))) {
-				os.writeUnshared(entity);
+				os.writeObject(entity);
 				os.flush();
 
 				return true;
