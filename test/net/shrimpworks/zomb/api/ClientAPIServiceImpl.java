@@ -55,13 +55,13 @@ public class ClientAPIServiceImpl implements ClientAPIService {
 		public void handle(HttpExchange httpExchange) throws IOException {
 			try {
 				if (!httpExchange.getRequestMethod().equals("POST")) {
-					httpExchange.sendResponseHeaders(405, -1); // method not allowed
+					respond(httpExchange, 405); // method not allowed - only POST supported
 				} else {
 					JsonObject req = JsonObject.readFrom(new InputStreamReader(httpExchange.getRequestBody()));
 
 					Application application = appRegistry.forKey(req.get("key").asString());
 					if (application == null) {
-						httpExchange.sendResponseHeaders(403, -1); // forbidden - invalid application
+						respond(httpExchange, 403); // forbidden - invalid application
 						return;
 					}
 
@@ -79,25 +79,34 @@ public class ClientAPIServiceImpl implements ClientAPIService {
 						}
 
 						if (response != null) {
-							String jsonResponse = jsonResponse(response).toString();
-							httpExchange.sendResponseHeaders(200, jsonResponse.length());
-							httpExchange.getResponseBody().write(jsonResponse.getBytes());
+							respond(httpExchange, 200, jsonResponse(response).toString()); // OK
 						} else {
-							httpExchange.sendResponseHeaders(501, -1); // not implemented - no executors for found plugin
+							respond(httpExchange, 501); // not implemented - no executors for found plugin
 						}
 
 					} catch (IllegalArgumentException e) {
 						logger.log(Level.INFO, e.getMessage(), e);
 
-						httpExchange.sendResponseHeaders(400, -1); // bas request - invalid query
+						respond(httpExchange, 400); // bad request - invalid query
 					}
 				}
 			} catch (Throwable t) {
 				// HttpServer does not behave well when exceptions are thrown in handlers
 				logger.log(Level.WARNING, t.getMessage(), t);
 
-				httpExchange.sendResponseHeaders(500, -1);
+				respond(httpExchange, 500);
+			} finally {
+				httpExchange.close();
 			}
+		}
+
+		private void respond(HttpExchange exchange, int status) throws IOException {
+			respond(exchange, status, null);
+		}
+
+		private void respond(HttpExchange exchange, int status, String body) throws IOException {
+			exchange.sendResponseHeaders(status, body == null || body.isEmpty() ? -1 : body.length());
+			if (body != null && !body.isEmpty()) exchange.getResponseBody().write(body.getBytes());
 		}
 
 		private JsonObject jsonResponse(Response response) {
