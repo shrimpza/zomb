@@ -60,7 +60,7 @@ public class ClientAPIServiceTest {
 
 		this.apiUrl = String.format("http://localhost:%d", port);
 
-		Jadler.initJadlerListeningOn(8092);
+		Jadler.initJadlerListeningOn(jadlerPort);
 	}
 
 	@After
