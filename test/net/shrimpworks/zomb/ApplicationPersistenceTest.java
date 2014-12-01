@@ -1,8 +1,15 @@
 package net.shrimpworks.zomb;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.shrimpworks.zomb.entities.application.Application;
 import net.shrimpworks.zomb.entities.application.ApplicationImpl;
@@ -18,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 public class ApplicationPersistenceTest {
 
 	@Test
-	public void applicationPersistenceTest() {
+	public void applicationPersistenceTest() throws IOException {
 		Application application = new ApplicationImpl("app", "key", "http://url.com", "bob <bob@mail");
 
 		application.users().add(new UserImpl("bob"));
@@ -31,7 +38,7 @@ public class ApplicationPersistenceTest {
 		application.plugins().add(new PluginImpl("math", "math ops", new CommandRegistryImpl(), "http://math.url", "sue@mail"));
 		application.plugins().find("math").commands().add(new CommandImpl("add", "add numbers", 0, ""));
 
-		ApplicationPersistence persistence = new ApplicationPersistence();
+		ApplicationPersistence persistence = new ApplicationPersistence(Files.createTempDirectory("zomb_apps"));
 		persistence.save(application);
 
 		List<Application> all = new ArrayList<>(persistence.all());
@@ -45,9 +52,26 @@ public class ApplicationPersistenceTest {
 
 	public static class ApplicationPersistence implements Persistence<Application> {
 
+		private static final Logger logger = Logger.getLogger(ApplicationPersistence.class.getName());
+
+		private final Path path;
+
+		public ApplicationPersistence(Path path) {
+			this.path = path;
+		}
+
 		@Override
 		public boolean save(Application entity) {
-			throw new UnsupportedOperationException("Method not implemented.");
+			try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(path.resolve(entity.key()).toFile()))) {
+				os.writeObject(entity);
+				os.flush();
+
+				return true;
+			} catch (IOException e) {
+				logger.log(Level.WARNING, "Failed to save entity", e);
+			}
+
+			return false;
 		}
 
 		@Override

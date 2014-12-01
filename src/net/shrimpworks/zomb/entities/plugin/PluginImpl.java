@@ -1,6 +1,10 @@
 package net.shrimpworks.zomb.entities.plugin;
 
-public class PluginImpl implements Plugin {
+import java.io.Serializable;
+
+public class PluginImpl implements Plugin, Serializable {
+
+	private static final long serialVersionUID = 1l;
 
 	private final String name;
 	private final String help;

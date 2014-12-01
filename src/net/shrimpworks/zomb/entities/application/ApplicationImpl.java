@@ -1,11 +1,15 @@
 package net.shrimpworks.zomb.entities.application;
 
+import java.io.Serializable;
+
 import net.shrimpworks.zomb.entities.plugin.PluginRegistry;
 import net.shrimpworks.zomb.entities.plugin.PluginRegistryImpl;
 import net.shrimpworks.zomb.entities.user.UserRegistry;
 import net.shrimpworks.zomb.entities.user.UserRegistryImpl;
 
-public class ApplicationImpl implements Application {
+public class ApplicationImpl implements Application, Serializable {
+
+	private static final long serialVersionUID = 1l;
 
 	private final String name;
 	private final String key;
