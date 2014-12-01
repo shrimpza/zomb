@@ -9,6 +9,7 @@ import com.eclipsesource.json.JsonObject;
 import net.shrimpworks.zomb.common.HttpClient;
 import net.shrimpworks.zomb.entities.Query;
 import net.shrimpworks.zomb.entities.Response;
+import net.shrimpworks.zomb.entities.ResponseImpl;
 import net.shrimpworks.zomb.entities.application.ApplicationImpl;
 import net.shrimpworks.zomb.entities.application.ApplicationRegistry;
 import net.shrimpworks.zomb.entities.application.ApplicationRegistryImpl;
@@ -17,7 +18,6 @@ import net.shrimpworks.zomb.entities.plugin.CommandImpl;
 import net.shrimpworks.zomb.entities.plugin.CommandRegistryImpl;
 import net.shrimpworks.zomb.entities.plugin.Plugin;
 import net.shrimpworks.zomb.entities.plugin.PluginImpl;
-import net.shrimpworks.zomb.entities.user.User;
 
 import org.junit.After;
 import org.junit.Before;
@@ -70,6 +70,44 @@ public class ClientAPIServiceTest {
 		} catch (IOException expected) {
 			// expected
 		}
+
+		try {
+			client.post(apiUrl,
+					new JsonObject()
+							.add("key", "wrong-key")
+							.add("user", "jane")
+							.add("query", "plugin list")
+							.toString());
+			fail("Invalid key should fail");
+		} catch (IOException expected) {
+			// expected
+		}
+
+		try {
+			client.post(apiUrl,
+					new JsonObject()
+							.add("key", "ckey")
+							.add("user", "jane")
+							.add("query", "wtf unknown")
+							.toString());
+			fail("Invalid plugin should fail");
+		} catch (IOException expected) {
+			// expected
+		}
+
+		String pluginList = client.post(apiUrl,
+				new JsonObject()
+						.add("key", "ckey")
+						.add("user", "jane")
+						.add("query", "plugin list")
+						.toString());
+
+		JsonObject json = JsonObject.readFrom(pluginList);
+
+		assertEquals("jane", json.get("user").asString());
+		assertEquals("plugin", json.get("plugin").asString());
+		assertTrue(json.get("response").asArray().get(0).asString().contains("plugin"));
+		assertTrue(json.get("response").asArray().get(0).asString().contains("help"));
 	}
 
 	@Test
@@ -251,45 +289,4 @@ public class ClientAPIServiceTest {
 		}
 	}
 
-	public static class ResponseImpl implements Response {
-
-		private final Plugin plugin;
-		private final User user;
-		private final String query;
-		private final String[] response;
-		private final String image;
-
-		public ResponseImpl(Plugin plugin, User user, String query, String[] response, String image) {
-			this.plugin = plugin;
-			this.user = user;
-			this.query = query;
-			this.response = response;
-			this.image = image;
-		}
-
-		@Override
-		public Plugin plugin() {
-			return plugin;
-		}
-
-		@Override
-		public User user() {
-			return user;
-		}
-
-		@Override
-		public String query() {
-			return query;
-		}
-
-		@Override
-		public String[] response() {
-			return response.clone();
-		}
-
-		@Override
-		public String image() {
-			return image;
-		}
-	}
 }
