@@ -70,11 +70,12 @@ public class ClientAPIServiceTest {
 			// expected
 		}
 
-		String pluginList = client.post(String.format("http://localhost:%d", port), "{" +
-				"  \"key\": \"ckey\"," +
-				"  \"user\": \"jane\"," +
-				"  \"query\": \"plugin list\"" +
-				"}");
+		String pluginList = client.post(String.format("http://localhost:%d", port),
+				new JsonObject()
+						.add("key", "ckey")
+						.add("user", "jane")
+						.add("query", "plugin list")
+						.toString());
 
 		JsonObject json = JsonObject.readFrom(pluginList);
 
