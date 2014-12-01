@@ -55,9 +55,7 @@ public class ClientAPIServiceTest {
 	public void queryTest() throws IOException {
 		this.appRegistry.add(new ApplicationImpl("client", "ckey", null, null));
 		this.appRegistry.find("client").plugins().add(new PluginManager());
-		this.appRegistry.find("client").plugins().add(new PluginImpl("help", "Provides plugin and command help functions",
-				new CommandRegistryImpl(), null, null));
-
+		this.appRegistry.find("client").plugins().add(new Help());
 
 		HttpClient client = new HttpClient(1000);
 
@@ -70,7 +68,11 @@ public class ClientAPIServiceTest {
 			// expected
 		}
 
-		String pluginList = client.post(String.format("http://localhost:%d", port),
+
+		/*
+		 * get a plugin list
+		 */
+		String pluginList = client.post(apiUrl,
 				new JsonObject()
 						.add("key", "ckey")
 						.add("user", "jane")
@@ -83,6 +85,42 @@ public class ClientAPIServiceTest {
 		assertEquals("plugin", json.get("plugin").asString());
 		assertTrue(json.get("response").asArray().get(0).asString().contains("plugin"));
 		assertTrue(json.get("response").asArray().get(0).asString().contains("help"));
+
+
+		/*
+		 * get help for the "plugin" plugin
+		 */
+		String pluginHelp = client.post(apiUrl,
+				new JsonObject()
+						.add("key", "ckey")
+						.add("user", "jane")
+						.add("query", "help show plugin")
+						.toString());
+
+		json = JsonObject.readFrom(pluginHelp);
+
+		assertEquals("jane", json.get("user").asString());
+		assertEquals("plugin", json.get("help").asString());
+		assertTrue(json.get("response").asArray().get(0).asString().equals("Provides plugin management functionality"));
+
+
+		/*
+		 * get list of commands for plugin management
+		 */
+		String pluginCmdList = client.post(apiUrl,
+				new JsonObject()
+						.add("key", "ckey")
+						.add("user", "jane")
+						.add("query", "help list plugin")
+						.toString());
+
+		json = JsonObject.readFrom(pluginCmdList);
+
+		assertEquals("jane", json.get("user").asString());
+		assertEquals("plugin", json.get("help").asString());
+		assertTrue(json.get("response").asArray().get(0).asString().contains("list"));
+		assertTrue(json.get("response").asArray().get(0).asString().contains("add"));
+		assertTrue(json.get("response").asArray().get(0).asString().contains("remove"));
 	}
 
 	public static class PluginManager extends PluginImpl {
@@ -138,11 +176,20 @@ public class ClientAPIServiceTest {
 		}
 	}
 
+	public static class Help extends PluginImpl {
+
+		public Help() {
+			super("help", "Provides plugin and command help functions", new CommandRegistryImpl(), null, null);
+			commands().add(new CommandImpl("show", "shows help for a plugin or plugin command", 0, "[A-Za-z]+|[A-Za-z]+ [A-Za-z]+"));
+			commands().add(new CommandImpl("list", "list commands available in a plugin", 1, null));
+		}
+	}
+
 	public static class HelpExecutor implements ClientQueryExecutor {
 
 		@Override
 		public boolean canExecute(Plugin plugin) {
-			return plugin.name().equals("help");
+			return plugin instanceof Help;
 		}
 
 		@Override
