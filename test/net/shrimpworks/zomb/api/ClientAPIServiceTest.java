@@ -265,13 +265,6 @@ public class ClientAPIServiceTest {
 	@Test
 	public void remotePluginTest() throws IOException {
 
-		/**
-		 "application": "unique-identifier",
-		 "user": "jane",
-		 "command": "command-name",
-		 "args": ["arg1", "arg2"],
-		 "query": "command-name arg1 arg2"
-		 */
 		Jadler.onRequest()
 				.havingPathEqualTo("/hello")
 				.havingMethodEqualTo("POST")

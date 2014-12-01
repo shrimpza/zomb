@@ -181,10 +181,6 @@ A plugin may not be named any of the following:
 - plugin
 - help
 
-A plugin may not have a command named any of the following:
-
-- commands
-
 
 ## Usage
 
