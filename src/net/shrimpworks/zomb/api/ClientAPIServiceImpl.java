@@ -3,7 +3,6 @@ package net.shrimpworks.zomb.api;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
-import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,11 +41,6 @@ public class ClientAPIServiceImpl implements ClientAPIService {
 	@Override
 	public void close() throws IOException {
 		this.httpServer.stop(0);
-	}
-
-	@Override
-	public Set<ClientQueryExecutor> executors() {
-		return Collections.unmodifiableSet(executors);
 	}
 
 	private class RootHandler implements HttpHandler {
