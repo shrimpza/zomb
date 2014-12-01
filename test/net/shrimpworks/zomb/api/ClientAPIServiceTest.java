@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -194,6 +195,23 @@ public class ClientAPIServiceTest {
 		assertEquals("jane", json.get("user").asString());
 		assertEquals("plugin", json.get("plugin").asString());
 		assertTrue(json.get("response").asArray().get(0).asString().toLowerCase().contains("success"));
+
+
+		/*
+		 * verify plugin was removed
+		 */
+		pluginList = client.post(apiUrl,
+				new JsonObject()
+						.add("key", "ckey")
+						.add("user", "jane")
+						.add("query", "plugin list")
+						.toString());
+
+		json = JsonObject.readFrom(pluginList);
+
+		assertEquals("jane", json.get("user").asString());
+		assertEquals("plugin", json.get("plugin").asString());
+		assertFalse(json.get("response").asArray().get(0).asString().contains("hello"));
 	}
 
 	@Test
@@ -329,7 +347,16 @@ public class ClientAPIServiceTest {
 		}
 
 		private Response remove(Query query) {
-			return null;
+			Plugin plugin = query.application().plugins().find(query.args().get(0));
+			if (plugin != null) {
+				if (plugin == query.application().plugins().remove(plugin)) {
+					return new ResponseImpl(query, new String[]{"Success, removed plugin"}, null);
+				} else {
+					return new ResponseImpl(query, new String[]{"Failed to remove plugin from application"}, null);
+				}
+			} else {
+				return new ResponseImpl(query, new String[]{"Failed to remove plugin, does not exist"}, null);
+			}
 		}
 	}
 
