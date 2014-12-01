@@ -34,10 +34,16 @@ public class ClientAPIServiceTest {
 
 	private ApplicationRegistry appRegistry;
 	private ClientAPIService service;
+	private HttpClient client;
+	private String apiUrl;
 
 	@Before
 	public void setup() throws IOException {
 		this.appRegistry = new ApplicationRegistryImpl();
+
+		this.appRegistry.add(new ApplicationImpl("client", "ckey", null, null));
+		this.appRegistry.find("client").plugins().add(new PluginManager());
+		this.appRegistry.find("client").plugins().add(new Help());
 
 		Set<ClientQueryExecutor> executors = new HashSet<>();
 		executors.add(new PluginManagementExecutor());
@@ -45,6 +51,10 @@ public class ClientAPIServiceTest {
 		executors.add(new HttpExecutor());
 
 		this.service = new ClientAPIServiceImpl(host, port, appRegistry, executors);
+
+		this.client = new HttpClient(1000);
+
+		this.apiUrl = String.format("http://localhost:%d", port);
 	}
 
 	@After
@@ -54,20 +64,16 @@ public class ClientAPIServiceTest {
 
 	@Test
 	public void queryTest() throws IOException {
-		this.appRegistry.add(new ApplicationImpl("client", "ckey", null, null));
-		this.appRegistry.find("client").plugins().add(new PluginManager());
-		this.appRegistry.find("client").plugins().add(new Help());
-
-		HttpClient client = new HttpClient(1000);
-
-		String apiUrl = String.format("http://localhost:%d", port);
-
 		try {
 			client.get(apiUrl);
 			fail("GET not supported");
 		} catch (IOException expected) {
 			// expected
 		}
+	}
+
+	@Test
+	public void pluginManagerTest() throws IOException {
 
 
 		/*
@@ -88,6 +94,10 @@ public class ClientAPIServiceTest {
 		assertTrue(json.get("response").asArray().get(0).asString().contains("help"));
 
 
+	}
+
+	@Test
+	public void helpTest() throws IOException {
 		/*
 		 * get help for the "plugin" plugin
 		 */
@@ -98,7 +108,7 @@ public class ClientAPIServiceTest {
 						.add("query", "help show plugin")
 						.toString());
 
-		json = JsonObject.readFrom(pluginHelp);
+		JsonObject json = JsonObject.readFrom(pluginHelp);
 
 		assertEquals("jane", json.get("user").asString());
 		assertEquals("help", json.get("plugin").asString());
