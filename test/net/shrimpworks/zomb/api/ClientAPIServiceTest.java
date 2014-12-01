@@ -159,6 +159,41 @@ public class ClientAPIServiceTest {
 		assertEquals("jane", json.get("user").asString());
 		assertEquals("plugin", json.get("plugin").asString());
 		assertTrue(json.get("response").asArray().get(0).asString().toLowerCase().contains("success"));
+
+
+		/*
+		 * verify plugin was added
+		 */
+		String pluginList = client.post(apiUrl,
+				new JsonObject()
+						.add("key", "ckey")
+						.add("user", "jane")
+						.add("query", "plugin list")
+						.toString());
+
+		json = JsonObject.readFrom(pluginList);
+
+		assertEquals("jane", json.get("user").asString());
+		assertEquals("plugin", json.get("plugin").asString());
+		assertTrue(json.get("response").asArray().get(0).asString().contains("hello"));
+
+
+		/*
+		 * remove plugin
+		 */
+		String removePlugin = client.post(apiUrl,
+				new JsonObject()
+						.add("key", "ckey")
+						.add("user", "jane")
+						.add("query", "plugin remove hello")
+						.toString()
+		);
+
+		json = JsonObject.readFrom(removePlugin);
+
+		assertEquals("jane", json.get("user").asString());
+		assertEquals("plugin", json.get("plugin").asString());
+		assertTrue(json.get("response").asArray().get(0).asString().toLowerCase().contains("success"));
 	}
 
 	@Test
