@@ -4,8 +4,12 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
+import net.jadler.Jadler;
 import net.shrimpworks.zomb.common.HttpClient;
 import net.shrimpworks.zomb.entities.Query;
 import net.shrimpworks.zomb.entities.Response;
@@ -31,6 +35,7 @@ public class ClientAPIServiceTest {
 
 	private static final String host = "0.0.0.0";
 	private static final int port = 8090;
+	private static final int jadlerPort = 8092;
 
 	private ApplicationRegistry appRegistry;
 	private ClientAPIService service;
@@ -55,11 +60,15 @@ public class ClientAPIServiceTest {
 		this.client = new HttpClient(1000);
 
 		this.apiUrl = String.format("http://localhost:%d", port);
+
+		Jadler.initJadlerListeningOn(8092);
 	}
 
 	@After
 	public void teardown() throws IOException {
 		this.service.close();
+
+		Jadler.closeJadler();
 	}
 
 	@Test
@@ -113,25 +122,42 @@ public class ClientAPIServiceTest {
 	@Test
 	public void pluginManagerTest() throws IOException {
 
+		Jadler.onRequest()
+				.havingPathEqualTo("/hello")
+				.havingMethodEqualTo("GET")
+				.respond()
+				.withContentType("application/json")
+				.withStatus(200)
+				.withBody(
+						new JsonObject()
+								.add("plugin", "hello")
+								.add("help", "always says hello")
+								.add("contact", "you <you@mail>")
+								.add("commands", new JsonArray().add(
+										new JsonObject()
+												.add("command", "lol")
+												.add("help", "says hello")
+												.add("args", 0)
+												.add("pattern", "")
+								)).toString()
+				);
 
 		/*
-		 * get a plugin list
+		 * add a plugin
 		 */
-		String pluginList = client.post(apiUrl,
+		String addPlugin = client.post(apiUrl,
 				new JsonObject()
 						.add("key", "ckey")
 						.add("user", "jane")
-						.add("query", "plugin list")
-						.toString());
+						.add("query", String.format("plugin add http://localhost:%d/hello", jadlerPort))
+						.toString()
+		);
 
-		JsonObject json = JsonObject.readFrom(pluginList);
+		JsonObject json = JsonObject.readFrom(addPlugin);
 
 		assertEquals("jane", json.get("user").asString());
 		assertEquals("plugin", json.get("plugin").asString());
-		assertTrue(json.get("response").asArray().get(0).asString().contains("plugin"));
-		assertTrue(json.get("response").asArray().get(0).asString().contains("help"));
-
-
+		assertTrue(json.get("response").asArray().get(0).asString().toLowerCase().contains("success"));
 	}
 
 	@Test
@@ -184,6 +210,14 @@ public class ClientAPIServiceTest {
 
 	public static class PluginManagementExecutor implements ClientQueryExecutor {
 
+		private static final Logger logger = Logger.getLogger(PluginManagementExecutor.class.getName());
+
+		private final HttpClient client;
+
+		public PluginManagementExecutor() {
+			this.client = new HttpClient(5000); // TODO config
+		}
+
 		@Override
 		public boolean canExecute(Plugin plugin) {
 			return plugin instanceof PluginManager;
@@ -217,6 +251,11 @@ public class ClientAPIServiceTest {
 		}
 
 		private Response add(Query query) {
+			try {
+				String pluginDef = client.get(query.args().get(0));
+			} catch (IOException e) {
+				logger.log(Level.WARNING, "Failed to get plugin definition", e);
+			}
 			return null;
 		}
 
