@@ -21,12 +21,27 @@ import net.shrimpworks.zomb.entities.plugin.CommandRegistryImpl;
 import net.shrimpworks.zomb.entities.plugin.PluginImpl;
 import net.shrimpworks.zomb.entities.user.UserImpl;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ApplicationPersistenceTest {
+
+	private Path temp;
+
+	@Before
+	public void setup() throws IOException {
+		temp = Files.createTempDirectory("zomb_apps");
+	}
+
+	@After
+	public void teardown() throws IOException {
+		Files.deleteIfExists(temp);
+	}
 
 	@Test
 	public void applicationPersistenceTest() throws IOException {
@@ -42,7 +57,7 @@ public class ApplicationPersistenceTest {
 		application.plugins().add(new PluginImpl("math", "math ops", new CommandRegistryImpl(), "http://math.url", "sue@mail"));
 		application.plugins().find("math").commands().add(new CommandImpl("add", "add numbers", 0, ""));
 
-		ApplicationPersistence persistence = new ApplicationPersistence(Files.createTempDirectory("zomb_apps"));
+		ApplicationPersistence persistence = new ApplicationPersistence(temp);
 		persistence.save(application);
 
 		List<Application> all = new ArrayList<>(persistence.all());
@@ -66,6 +81,8 @@ public class ApplicationPersistenceTest {
 		assertEquals("joe@mail", app.plugins().find("weather").contact());
 
 		assertNotNull(app.plugins().find("weather").commands().find("current"));
+
+		assertTrue(persistence.delete(app));
 	}
 
 	public static class ApplicationPersistence implements Persistence<Application> {
@@ -90,7 +107,7 @@ public class ApplicationPersistenceTest {
 
 		@Override
 		public boolean delete(Application entity) throws IOException {
-			throw new UnsupportedOperationException("Method not implemented.");
+			return Files.deleteIfExists(path.resolve(entity.key()));
 		}
 
 		@Override
