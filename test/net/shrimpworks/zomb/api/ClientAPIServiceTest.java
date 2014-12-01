@@ -3,6 +3,7 @@ package net.shrimpworks.zomb.api;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import com.eclipsesource.json.JsonArray;
@@ -10,6 +11,7 @@ import com.eclipsesource.json.JsonObject;
 import net.jadler.Jadler;
 import net.shrimpworks.zomb.common.HttpClient;
 import net.shrimpworks.zomb.entities.Query;
+import net.shrimpworks.zomb.entities.QueryImpl;
 import net.shrimpworks.zomb.entities.Response;
 import net.shrimpworks.zomb.entities.ResponseImpl;
 import net.shrimpworks.zomb.entities.application.ApplicationImpl;
@@ -247,6 +249,23 @@ public class ClientAPIServiceTest {
 		assertTrue(json.get("response").asArray().get(0).asString().contains("list"));
 		assertTrue(json.get("response").asArray().get(0).asString().contains("add"));
 		assertTrue(json.get("response").asArray().get(0).asString().contains("remove"));
+
+
+		/*
+		 * get help for plugin's list command
+		 */
+		String pluginCommandHelp = client.post(apiUrl,
+				new JsonObject()
+						.add("key", "ckey")
+						.add("user", "jane")
+						.add("query", "help show plugin list")
+						.toString());
+
+		json = JsonObject.readFrom(pluginCommandHelp);
+
+		assertEquals("jane", json.get("user").asString());
+		assertEquals("help", json.get("plugin").asString());
+		assertTrue(json.get("response").asArray().get(0).asString().equals("list installed plugins"));
 	}
 
 
@@ -278,10 +297,18 @@ public class ClientAPIServiceTest {
 			}
 
 			private Response show(Query query) {
-				if (query.args().size() > 1) throw new UnsupportedOperationException("Not implemented"); // TODO
+				List<String> args = QueryImpl.parseQuery(query.args().get(0));
 
-				Plugin plugin = query.application().plugins().find(query.args().get(0));
-				return new ResponseImpl(query, new String[]{plugin.help()}, null);
+				Plugin plugin = query.application().plugins().find(args.get(0));
+
+				String help;
+				if (args.size() > 1) {
+					help = plugin.commands().find(args.get(1)).help();
+				} else {
+					help = plugin.help();
+				}
+
+				return new ResponseImpl(query, new String[]{help}, null);
 			}
 
 			private Response list(Query query) {

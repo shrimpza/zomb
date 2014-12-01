@@ -25,7 +25,7 @@ public class QueryImpl implements Query {
 		this.user = user;
 		this.query = query;
 
-		List<String> queryParts = queryParts(query);
+		List<String> queryParts = parseQuery(query);
 
 		if (queryParts.size() < 2)
 			throw new IllegalArgumentException("Invalid query: cannot determine plugin and command");
@@ -80,7 +80,7 @@ public class QueryImpl implements Query {
 		return query;
 	}
 
-	private List<String> queryParts(String query) {
+	public static List<String> parseQuery(String query) {
 		List<String> res = new ArrayList<>();
 		Pattern regex = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
 		Matcher regexMatcher = regex.matcher(query);
