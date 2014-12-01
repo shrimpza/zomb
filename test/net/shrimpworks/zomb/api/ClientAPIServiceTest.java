@@ -3,6 +3,8 @@ package net.shrimpworks.zomb.api;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
@@ -13,7 +15,12 @@ import net.shrimpworks.zomb.entities.Response;
 import net.shrimpworks.zomb.entities.application.ApplicationImpl;
 import net.shrimpworks.zomb.entities.application.ApplicationRegistry;
 import net.shrimpworks.zomb.entities.application.ApplicationRegistryImpl;
+import net.shrimpworks.zomb.entities.plugin.CommandImpl;
+import net.shrimpworks.zomb.entities.plugin.CommandRegistryImpl;
 import net.shrimpworks.zomb.entities.plugin.Plugin;
+import net.shrimpworks.zomb.entities.plugin.PluginImpl;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 
 import org.junit.After;
 import org.junit.Before;
@@ -260,7 +267,72 @@ public class ClientAPIServiceTest {
 		assertTrue(json.get("response").asArray().get(0).asString().equals("list installed plugins"));
 	}
 
+	@Test
+	public void remotePluginTest() throws IOException {
+
+		/**
+		 "application": "unique-identifier",
+		 "user": "jane",
+		 "command": "command-name",
+		 "args": ["arg1", "arg2"],
+		 "query": "command-name arg1 arg2"
+		 */
+		Jadler.onRequest()
+				.havingPathEqualTo("/hello")
+				.havingMethodEqualTo("POST")
+				.havingBody(new BaseMatcher<String>() {
+					@Override
+					public boolean matches(Object o) {
+						JsonObject json = JsonObject.readFrom(o.toString());
+						return json.get("command").asString().equals("hello")
+								&& json.get("application").isString()
+								&& json.get("user").asString().equals("jane")
+								&& json.get("args").asArray().isEmpty();
+					}
+
+					@Override
+					public void describeTo(Description description) {
+						throw new UnsupportedOperationException("Method not implemented.");
+					}
+				})
+				.respond()
+				.withContentType("application/json")
+				.withStatus(200)
+				.withBody(
+						new JsonObject()
+								.add("response", new JsonArray().add("hello world"))
+								.add("image", "")
+								.toString()
+				);
+
+		appRegistry.find("client").plugins().add(new PluginImpl("hello", null, new CommandRegistryImpl(),
+				String.format("http://localhost:%d/hello", jadlerPort), null));
+		appRegistry.find("client").plugins().find("hello").commands().add(new CommandImpl("hello", "say hello world", 0, null));
+
+		String addPlugin = client.post(apiUrl,
+				new JsonObject()
+						.add("key", "ckey")
+						.add("user", "jane")
+						.add("query", "hello hello")
+						.toString()
+		);
+
+		JsonObject json = JsonObject.readFrom(addPlugin);
+
+		assertEquals("jane", json.get("user").asString());
+		assertEquals("hello", json.get("plugin").asString());
+		assertTrue(json.get("response").asArray().get(0).asString().equals("hello world"));
+	}
+
 	public static class HttpExecutor implements ClientQueryExecutor {
+
+		private static final Logger logger = Logger.getLogger(HttpExecutor.class.getName());
+
+		private final HttpClient client;
+
+		public HttpExecutor() {
+			this.client = new HttpClient(5000); // TODO config
+		}
 
 		@Override
 		public boolean canExecute(Plugin plugin) {
@@ -269,7 +341,17 @@ public class ClientAPIServiceTest {
 
 		@Override
 		public Response execute(Query query) {
-			throw new UnsupportedOperationException("Method not implemented.");
+			try {
+				String res = client.post(query.plugin().url(),
+						new JsonObject()
+								.add("application", query.application().key())
+								.toString()
+				);
+			} catch (IOException e) {
+				logger.log(Level.WARNING, "Failed to execute remote plugin", e);
+			}
+
+			return null;
 		}
 	}
 
