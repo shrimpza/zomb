@@ -44,7 +44,7 @@ public class QueryImpl implements Query {
 			this.args = Collections.singletonList(queryString);
 		} else {
 			if (this.command.arguments() > 0 && queryParts.size() != this.command.arguments())
-				throw new IllegalArgumentException("Invalid query: too many arguments, see command help");
+				throw new IllegalArgumentException("Invalid query: incorrect argument count, see command help");
 
 			this.args = queryParts;
 		}

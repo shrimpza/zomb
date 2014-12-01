@@ -213,12 +213,12 @@ List available plugins:
 Plugins are expected to provide a brief help blurb, which can be accessed as
 follows:
 
-```help plugin-name```
+```help show plugin-name```
 
 See the available commands a plugin provides:
 
-```help plugin-name commands```
+```help list plugin-name```
 
 To access help for a specific command:
 
-```help plugin-name command-name```
+```help show plugin-name command-name```
