@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 import net.jadler.Jadler;
 import net.shrimpworks.zomb.common.HttpClient;
 import net.shrimpworks.zomb.entities.Query;
@@ -252,11 +253,44 @@ public class ClientAPIServiceTest {
 
 		private Response add(Query query) {
 			try {
-				String pluginDef = client.get(query.args().get(0));
+				String pluginDefSource = client.get(query.args().get(0));
+
+				JsonObject pluginDef = JsonObject.readFrom(pluginDefSource);
+
+				if (query.application().plugins().find(pluginDef.get("plugin").asString()) != null) {
+					return new ResponseImpl(query, new String[]{"Failed to add plugin: already exists"}, null);
+				}
+
+				if (pluginDef.get("commands").asArray().isEmpty()) {
+					return new ResponseImpl(query, new String[]{"Failed to add plugin: no commands"}, null);
+				}
+
+				Plugin plugin = new PluginImpl(
+						pluginDef.get("plugin").asString(),
+						pluginDef.get("help").asString(),
+						new CommandRegistryImpl(),
+						query.args().get(0),
+						pluginDef.get("contact").asString());
+
+				for (JsonValue commands : pluginDef.get("commands").asArray()) {
+					plugin.commands().add(new CommandImpl(
+							commands.asObject().get("command").asString(),
+							commands.asObject().get("help").asString(),
+							commands.asObject().get("args").asInt(),
+							commands.asObject().get("pattern").asString()
+					));
+				}
+
+				if (query.application().plugins().add(plugin)) {
+					return new ResponseImpl(query, new String[]{String.format("Success, added new plugin %s", plugin.name())}, null);
+				} else {
+					return new ResponseImpl(query, new String[]{"Failed to add plugin to application"}, null);
+				}
 			} catch (IOException e) {
 				logger.log(Level.WARNING, "Failed to get plugin definition", e);
+
+				return new ResponseImpl(query, new String[]{"Failed to get plugin: " + e.getMessage()}, null);
 			}
-			return null;
 		}
 
 		private Response remove(Query query) {
@@ -296,7 +330,7 @@ public class ClientAPIServiceTest {
 			if (query.args().size() > 1) throw new UnsupportedOperationException("Not implemented"); // TODO
 
 			Plugin plugin = query.application().plugins().find(query.args().get(0));
-			return new ResponseImpl(query.plugin(), query.user(), query.query(), new String[]{plugin.help()}, null);
+			return new ResponseImpl(query, new String[]{plugin.help()}, null);
 		}
 
 		private Response list(Query query) {
@@ -311,7 +345,7 @@ public class ClientAPIServiceTest {
 				}
 			}
 
-			return new ResponseImpl(query.plugin(), query.user(), query.query(), new String[]{sb.toString()}, null);
+			return new ResponseImpl(query, new String[]{sb.toString()}, null);
 		}
 	}
 
