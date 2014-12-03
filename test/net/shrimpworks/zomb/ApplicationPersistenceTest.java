@@ -4,6 +4,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -14,6 +15,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.shrimpworks.zomb.entities.AbstractRegistry;
+import net.shrimpworks.zomb.entities.HasName;
+import net.shrimpworks.zomb.entities.Registry;
 import net.shrimpworks.zomb.entities.application.Application;
 import net.shrimpworks.zomb.entities.application.ApplicationImpl;
 import net.shrimpworks.zomb.entities.plugin.CommandImpl;
@@ -84,6 +88,17 @@ public class ApplicationPersistenceTest {
 
 		assertTrue(persistence.delete(app));
 	}
+
+
+	public static class PersistentRegistry<T extends HasName> extends AbstractRegistry<T> implements Registry<T>, Serializable {
+
+		private final Persistence<T> persistence;
+
+		public PersistentRegistry(Persistence<T> persistence) {
+			this.persistence = persistence;
+		}
+	}
+
 
 	public static class ApplicationPersistence implements Persistence<Application> {
 
