@@ -16,7 +16,7 @@ import net.shrimpworks.zomb.entities.plugin.PluginImpl;
 public class Help extends PluginImpl {
 
 	public Help() {
-		super("help", "Provides plugin and command help functions", new CommandRegistryImpl(), null, null);
+		super("help", "Provides plugin and command help functions", null, null, new CommandRegistryImpl());
 		commands().add(new CommandImpl("show", "shows help for a plugin or plugin command", 0, "[A-Za-z]+|[A-Za-z]+ [A-Za-z]+"));
 		commands().add(new CommandImpl("list", "list commands available in a plugin", 1, null));
 	}

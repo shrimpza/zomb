@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.eclipsesource.json.JsonObject;
 import net.shrimpworks.zomb.entities.AbstractRegistry;
 import net.shrimpworks.zomb.entities.HasName;
 import net.shrimpworks.zomb.entities.Registry;
@@ -32,6 +34,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ApplicationPersistenceTest {
 
@@ -54,11 +57,11 @@ public class ApplicationPersistenceTest {
 		application.users().add(new UserImpl("bob"));
 		application.users().add(new UserImpl("jane"));
 
-		application.plugins().add(new PluginImpl("weather", "weather info", new CommandRegistryImpl(), "http://plugin.url", "joe@mail"));
+		application.plugins().add(new PluginImpl("weather", "weather info", "http://plugin.url", "joe@mail", new CommandRegistryImpl()));
 		application.plugins().find("weather").commands().add(new CommandImpl("current", "current weather", 1, ""));
 		application.plugins().find("weather").commands().add(new CommandImpl("tomorrow", "tomorrow's weather", 0, null));
 
-		application.plugins().add(new PluginImpl("math", "math ops", new CommandRegistryImpl(), "http://math.url", "sue@mail"));
+		application.plugins().add(new PluginImpl("math", "math ops", "http://math.url", "sue@mail", new CommandRegistryImpl()));
 		application.plugins().find("math").commands().add(new CommandImpl("add", "add numbers", 0, ""));
 
 		ApplicationPersistence persistence = new ApplicationPersistence(temp);
@@ -91,22 +94,24 @@ public class ApplicationPersistenceTest {
 
 	@Test
 	public void persistentRegistryTest() throws IOException {
-		Persistence<Application> appStore = new FilesystemPersistence<>(temp);
-		PersistentAppRegistry appRegistry = new PersistentAppRegistry(appStore);
+		Persistence<JsonObject> appStore = new FilesystemPersistence(temp);
+//		PersistentAppRegistry appRegistry = new PersistentAppRegistry(appStore);
 
 		Application application = new ApplicationImpl("app", "key", "http://url.com", "bob <bob@mail>");
 
 		application.users().add(new UserImpl("bob"));
 		application.users().add(new UserImpl("jane"));
 
-		application.plugins().add(new PluginImpl("weather", "weather info", new CommandRegistryImpl(), "http://plugin.url", "joe@mail"));
+		application.plugins().add(new PluginImpl("weather", "weather info", "http://plugin.url", "joe@mail", new CommandRegistryImpl()));
 		application.plugins().find("weather").commands().add(new CommandImpl("current", "current weather", 1, ""));
 		application.plugins().find("weather").commands().add(new CommandImpl("tomorrow", "tomorrow's weather", 0, null));
 
-		application.plugins().add(new PluginImpl("math", "math ops", new CommandRegistryImpl(), "http://math.url", "sue@mail"));
+		application.plugins().add(new PluginImpl("math", "math ops", "http://math.url", "sue@mail", new CommandRegistryImpl()));
 		application.plugins().find("math").commands().add(new CommandImpl("add", "add numbers", 0, ""));
 
-		appRegistry.add(application);
+//		appRegistry.add(application);
+
+		fail("todo");
 	}
 
 	public static class PersistentAppRegistry extends PersistentRegistry<Application> {
@@ -156,7 +161,7 @@ public class ApplicationPersistenceTest {
 		}
 	}
 
-	public static class FilesystemPersistence<T extends HasName> implements Persistence<T> {
+	public static class FilesystemPersistence implements Persistence<JsonObject> {
 
 		private static final Logger logger = Logger.getLogger(FilesystemPersistence.class.getName());
 
@@ -167,40 +172,55 @@ public class ApplicationPersistenceTest {
 		}
 
 		@Override
-		public boolean save(T entity) throws IOException {
-			try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(path.resolve(entity.name()).toFile()))) {
-				os.writeObject(entity);
-				os.flush();
-
-				return true;
-			}
+		public boolean save(JsonObject entity) throws IOException {
+			return Files.write(path.resolve(entity.get("name").asString()), entity.toString().getBytes(Charset.forName("UTF-8"))) != null;
 		}
 
 		@Override
-		public boolean delete(T entity) throws IOException {
-			return Files.deleteIfExists(path.resolve(entity.name()));
+		public boolean delete(JsonObject entity) throws IOException {
+			throw new UnsupportedOperationException("Method not implemented.");
 		}
 
 		@Override
-		public Collection<T> all() throws IOException {
-			Set<T> all = new HashSet<>();
-
-			for (Object o : Files.list(path).toArray()) {
-				all.add(readFile((Path) o));
-			}
-
-			return all;
+		public Collection<JsonObject> all() throws IOException {
+			throw new UnsupportedOperationException("Method not implemented.");
 		}
 
-		@SuppressWarnings("unchecked")
-		private T readFile(Path path) throws IOException {
-			try (ObjectInputStream is = new ObjectInputStream(Files.newInputStream(path))) {
-				return (T) is.readObject();
-			} catch (ClassNotFoundException e) {
-				logger.log(Level.WARNING, "Failed to read entity", e);
-			}
-			return null;
-		}
+		//		@Override
+//		public boolean save(T entity) throws IOException {
+//			try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(path.resolve(entity.name()).toFile()))) {
+//				os.writeObject(entity);
+//				os.flush();
+//
+//				return true;
+//			}
+//		}
+//
+//		@Override
+//		public boolean delete(T entity) throws IOException {
+//			return Files.deleteIfExists(path.resolve(entity.name()));
+//		}
+//
+//		@Override
+//		public Collection<T> all() throws IOException {
+//			Set<T> all = new HashSet<>();
+//
+//			for (Object o : Files.list(path).toArray()) {
+//				all.add(readFile((Path) o));
+//			}
+//
+//			return all;
+//		}
+//
+//		@SuppressWarnings("unchecked")
+//		private T readFile(Path path) throws IOException {
+//			try (ObjectInputStream is = new ObjectInputStream(Files.newInputStream(path))) {
+//				return (T) is.readObject();
+//			} catch (ClassNotFoundException e) {
+//				logger.log(Level.WARNING, "Failed to read entity", e);
+//			}
+//			return null;
+//		}
 	}
 
 	public static class ApplicationPersistence implements Persistence<Application> {

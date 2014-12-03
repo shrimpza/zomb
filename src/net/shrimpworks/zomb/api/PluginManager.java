@@ -19,7 +19,7 @@ import net.shrimpworks.zomb.entities.plugin.PluginImpl;
 public class PluginManager extends PluginImpl {
 
 	public PluginManager() {
-		super("plugin", "Provides plugin management functionality", new CommandRegistryImpl(), null, null);
+		super("plugin", "Provides plugin management functionality", null, null, new CommandRegistryImpl());
 		commands().add(new CommandImpl("list", "list installed plugins", 0, null));
 		commands().add(new CommandImpl("add", "add a new plugin", 1, null));
 		commands().add(new CommandImpl("remove", "remove an installed plugin", 1, null));
@@ -84,9 +84,9 @@ public class PluginManager extends PluginImpl {
 				Plugin plugin = new PluginImpl(
 						pluginDef.get("plugin").asString(),
 						pluginDef.get("help").asString(),
-						new CommandRegistryImpl(),
 						query.args().get(0),
-						pluginDef.get("contact").asString());
+						pluginDef.get("contact").asString(),
+						new CommandRegistryImpl());
 
 				for (JsonValue commands : pluginDef.get("commands").asArray()) {
 					plugin.commands().add(new CommandImpl(
