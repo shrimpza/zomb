@@ -1,11 +1,10 @@
 package net.shrimpworks.zomb.entities;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
-public abstract class AbstractRegistry<T extends HasName> implements Registry<T>, Serializable {
+public abstract class AbstractRegistry<T extends HasName> implements Registry<T> {
 
 	private final Collection<T> entities;
 

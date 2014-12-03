@@ -12,7 +12,11 @@ public class PluginImpl implements Plugin, Serializable {
 	private final String url;
 	private final String contact;
 
-	public PluginImpl(String name, String help, CommandRegistry commands, String url, String contact) {
+	public PluginImpl(String name, String help, String url, String contact) {
+		this(name, help, url, contact, new CommandRegistryImpl());
+	}
+
+	public PluginImpl(String name, String help, String url, String contact, CommandRegistry commands) {
 		this.name = name;
 		this.help = help;
 		this.commands = commands;
