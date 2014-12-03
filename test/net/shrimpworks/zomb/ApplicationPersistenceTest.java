@@ -89,16 +89,119 @@ public class ApplicationPersistenceTest {
 		assertTrue(persistence.delete(app));
 	}
 
+	@Test
+	public void persistentRegistryTest() throws IOException {
+		Persistence<Application> appStore = new FilesystemPersistence<>(temp);
+		PersistentAppRegistry appRegistry = new PersistentAppRegistry(appStore);
+
+		Application application = new ApplicationImpl("app", "key", "http://url.com", "bob <bob@mail>");
+
+		application.users().add(new UserImpl("bob"));
+		application.users().add(new UserImpl("jane"));
+
+		application.plugins().add(new PluginImpl("weather", "weather info", new CommandRegistryImpl(), "http://plugin.url", "joe@mail"));
+		application.plugins().find("weather").commands().add(new CommandImpl("current", "current weather", 1, ""));
+		application.plugins().find("weather").commands().add(new CommandImpl("tomorrow", "tomorrow's weather", 0, null));
+
+		application.plugins().add(new PluginImpl("math", "math ops", new CommandRegistryImpl(), "http://math.url", "sue@mail"));
+		application.plugins().find("math").commands().add(new CommandImpl("add", "add numbers", 0, ""));
+
+		appRegistry.add(application);
+	}
+
+	public static class PersistentAppRegistry extends PersistentRegistry<Application> {
+
+		public PersistentAppRegistry(Persistence<Application> persistence) throws IOException {
+			super(persistence);
+		}
+	}
 
 	public static class PersistentRegistry<T extends HasName> extends AbstractRegistry<T> implements Registry<T>, Serializable {
 
 		private final Persistence<T> persistence;
 
-		public PersistentRegistry(Persistence<T> persistence) {
+		public PersistentRegistry(Persistence<T> persistence) throws IOException {
 			this.persistence = persistence;
+
+			persistence.all().forEach(this::add);
+		}
+
+		@Override
+		public boolean add(T entity) {
+			if (super.add(entity)) {
+				try {
+					persistence.save(entity);
+
+					return true;
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+
+			return false;
+		}
+
+		@Override
+		public T remove(T entity) {
+			T res;
+			if ((res = super.remove(entity)) != null) {
+				try {
+					persistence.delete(res);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+
+			return res;
 		}
 	}
 
+	public static class FilesystemPersistence<T extends HasName> implements Persistence<T> {
+
+		private static final Logger logger = Logger.getLogger(FilesystemPersistence.class.getName());
+
+		private final Path path;
+
+		public FilesystemPersistence(Path path) {
+			this.path = path;
+		}
+
+		@Override
+		public boolean save(T entity) throws IOException {
+			try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(path.resolve(entity.name()).toFile()))) {
+				os.writeObject(entity);
+				os.flush();
+
+				return true;
+			}
+		}
+
+		@Override
+		public boolean delete(T entity) throws IOException {
+			return Files.deleteIfExists(path.resolve(entity.name()));
+		}
+
+		@Override
+		public Collection<T> all() throws IOException {
+			Set<T> all = new HashSet<>();
+
+			for (Object o : Files.list(path).toArray()) {
+				all.add(readFile((Path) o));
+			}
+
+			return all;
+		}
+
+		@SuppressWarnings("unchecked")
+		private T readFile(Path path) throws IOException {
+			try (ObjectInputStream is = new ObjectInputStream(Files.newInputStream(path))) {
+				return (T) is.readObject();
+			} catch (ClassNotFoundException e) {
+				logger.log(Level.WARNING, "Failed to read entity", e);
+			}
+			return null;
+		}
+	}
 
 	public static class ApplicationPersistence implements Persistence<Application> {
 
