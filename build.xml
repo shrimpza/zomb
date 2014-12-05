@@ -96,6 +96,11 @@
                 <exclude name="**/*-sources.jar"/>
             </fileset>
         </copy>
+
+        <zip destfile="${dist.dir}/${ant.project.name}.zip">
+            <zipfileset dir="${dist.dir}/lib" prefix="lib"/>
+            <fileset dir="${dist.dir}" includes="${ant.project.name}.jar"/>
+        </zip>
     </target>
 
     <!-- Build test classes -->
