@@ -39,6 +39,8 @@ import static org.junit.Assert.assertNotNull;
 
 public class ApplicationPersistenceTest {
 
+	private final String appName = "app";
+
 	private Path temp;
 
 	@Before
@@ -47,21 +49,24 @@ public class ApplicationPersistenceTest {
 	}
 
 	@After
-	public void teardown() throws IOException {
+	public void teardown() throws IOException, InterruptedException {
+		Files.deleteIfExists(temp.resolve(appName + ".plugins"));
+		Files.deleteIfExists(temp.resolve(appName + ".users"));
 		Files.deleteIfExists(temp);
 	}
 
 	@Test
 	public void persistentRegistryTest() throws IOException {
-		Persistence<Application> appStore = new ApplicationPersistence(new FilesystemPersistence(temp));
-		Persistence<Plugin> plugStore = new PluginPersistence(new FilesystemPersistence(temp.resolve("app.plugins")));
-		Persistence<User> userStore = new UserPersistence(new FilesystemPersistence(temp.resolve("app.users")));
+
+		Persistence<Plugin> plugStore = new PluginPersistence(new FilesystemPersistence(temp.resolve(appName + ".plugins")));
+		Persistence<User> userStore = new UserPersistence(new FilesystemPersistence(temp.resolve(appName + ".users")));
+		Persistence<Application> appStore = new ApplicationPersistence(new FilesystemPersistence(temp), plugStore, userStore);
 
 		PersistentRegistry<Application> appRegistry = new PersistentRegistry<>(appStore);
 		PersistentRegistry<Plugin> pluginRegistry = new PersistentRegistry<>(plugStore);
 		PersistentRegistry<User> userRegistry = new PersistentRegistry<>(userStore);
 
-		Application application = new ApplicationImpl("app", "key", "http://url.com", "bob <bob@mail>", pluginRegistry, userRegistry);
+		Application application = new ApplicationImpl(appName, "key", "http://url.com", "bob <bob@mail>", pluginRegistry, userRegistry);
 
 		application.users().add(new UserImpl("bob"));
 		application.users().add(new UserImpl("jane"));
@@ -103,14 +108,26 @@ public class ApplicationPersistenceTest {
 		assertNotNull(appRegistry.remove(application));
 
 		assertEquals(0, appStore.all().size());
+
+		// clean up bits
+		assertNotNull(app.plugins().remove(app.plugins().find("weather")));
+		assertNotNull(app.plugins().remove(app.plugins().find("math")));
+		assertNotNull(app.users().remove(app.users().find("bob")));
+		assertNotNull(app.users().remove(app.users().find("jane")));
 	}
 
 	public static class ApplicationPersistence implements Persistence<Application> {
 
-		private final Persistence<JsonObject> persistence;
+		private static final Logger logger = Logger.getLogger(ApplicationPersistence.class.getName());
 
-		public ApplicationPersistence(Persistence<JsonObject> persistence) {
+		private final Persistence<JsonObject> persistence;
+		private final Persistence<Plugin> pluginPersistence;
+		private final Persistence<User> userPersistence;
+
+		public ApplicationPersistence(Persistence<JsonObject> persistence, Persistence<Plugin> pluginPersistence, Persistence<User> userPersistence) {
 			this.persistence = persistence;
+			this.pluginPersistence = pluginPersistence;
+			this.userPersistence = userPersistence;
 		}
 
 		@Override
@@ -132,12 +149,21 @@ public class ApplicationPersistenceTest {
 		public Collection<Application> all() throws IOException {
 			Collection<JsonObject> json = persistence.all();
 
-			Set<Application> all = json.stream().map(j -> new ApplicationImpl(
-					j.get("name").asString(),
-					j.get("key").asString(),
-					j.get("url").asString(),
-					j.get("contact").asString()
-			)).collect(Collectors.toSet());
+			Set<Application> all = json.stream().map(j -> {
+				try {
+					return new ApplicationImpl(
+							j.get("name").asString(),
+							j.get("key").asString(),
+							j.get("url").asString(),
+							j.get("contact").asString(),
+							new PersistentRegistry<>(pluginPersistence),
+							new PersistentRegistry<>(userPersistence)
+					);
+				} catch (IOException e) {
+					logger.log(Level.WARNING, "Failed to load application", e);
+				}
+				return null;
+			}).collect(Collectors.toSet());
 
 			return Collections.unmodifiableCollection(all);
 		}
@@ -187,9 +213,10 @@ public class ApplicationPersistenceTest {
 		public boolean save(Plugin entity) throws IOException {
 			JsonObject json = new JsonObject()
 					.add("name", entity.name())
-					.add("help", entity.name())
-					.add("url", entity.name())
-					.add("contact", entity.name());
+					.add("help", entity.help())
+					.add("url", entity.url())
+					.add("contact", entity.contact())
+					.add("commands", commands(entity.commands()));
 			return persistence.save(json);
 		}
 
@@ -213,13 +240,25 @@ public class ApplicationPersistenceTest {
 			return Collections.unmodifiableCollection(all);
 		}
 
+		private JsonArray commands(Registry<Command> commands) {
+			JsonArray jsonArray = new JsonArray();
+			commands.all().forEach(c -> jsonArray.add(
+					new JsonObject()
+							.add("name", c.name())
+							.add("help", c.help())
+							.add("args", c.arguments())
+							.add("pattern", c.pattern() == null ? null : c.pattern().pattern())
+			));
+			return jsonArray;
+		}
+
 		private Registry<Command> commands(JsonArray jsonArray) {
 			Registry<Command> commands = new RegistryImpl<>();
 			jsonArray.forEach(j -> commands.add(new CommandImpl(
 							j.asObject().get("name").asString(),
 							j.asObject().get("help").asString(),
 							j.asObject().get("args").asInt(),
-							j.asObject().get("pattern").asString()
+							j.asObject().get("pattern").isNull() ? null : j.asObject().get("pattern").asString()
 					))
 			);
 			return commands;
