@@ -1,4 +1,4 @@
-package net.shrimpworks.zomb;
+package net.shrimpworks.zomb.entities;
 
 import java.io.IOException;
 import java.util.Collection;
