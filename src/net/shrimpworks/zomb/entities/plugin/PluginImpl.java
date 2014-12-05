@@ -2,13 +2,15 @@ package net.shrimpworks.zomb.entities.plugin;
 
 import java.io.Serializable;
 
+import net.shrimpworks.zomb.entities.Registry;
+
 public class PluginImpl implements Plugin, Serializable {
 
 	private static final long serialVersionUID = 1l;
 
 	private final String name;
 	private final String help;
-	private final CommandRegistry commands;
+	private final Registry<Command> commands;
 	private final String url;
 	private final String contact;
 
@@ -16,7 +18,7 @@ public class PluginImpl implements Plugin, Serializable {
 		this(name, help, url, contact, new CommandRegistryImpl());
 	}
 
-	public PluginImpl(String name, String help, String url, String contact, CommandRegistry commands) {
+	public PluginImpl(String name, String help, String url, String contact, Registry<Command> commands) {
 		this.name = name;
 		this.help = help;
 		this.commands = commands;
@@ -35,7 +37,7 @@ public class PluginImpl implements Plugin, Serializable {
 	}
 
 	@Override
-	public CommandRegistry commands() {
+	public Registry<Command> commands() {
 		return commands;
 	}
 

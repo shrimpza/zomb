@@ -1,6 +1,7 @@
 package net.shrimpworks.zomb.entities.plugin;
 
 import net.shrimpworks.zomb.entities.HasName;
+import net.shrimpworks.zomb.entities.Registry;
 
 /**
  * Plugins implement the actual functionality of the system.
@@ -29,7 +30,7 @@ public interface Plugin extends HasName {
 	 *
 	 * @return registry of supported commands
 	 */
-	public CommandRegistry commands();
+	public Registry<Command> commands();
 
 	/**
 	 * URL to be accessed to process commands issued to this plugin.

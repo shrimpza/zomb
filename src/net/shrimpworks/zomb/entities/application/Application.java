@@ -1,8 +1,9 @@
 package net.shrimpworks.zomb.entities.application;
 
 import net.shrimpworks.zomb.entities.HasName;
-import net.shrimpworks.zomb.entities.plugin.PluginRegistry;
-import net.shrimpworks.zomb.entities.user.UserRegistry;
+import net.shrimpworks.zomb.entities.Registry;
+import net.shrimpworks.zomb.entities.plugin.Plugin;
+import net.shrimpworks.zomb.entities.user.User;
 
 /**
  * An Application represents an external producer of query messages.
@@ -47,12 +48,12 @@ public interface Application extends HasName {
 	 *
 	 * @return plugin registry
 	 */
-	public PluginRegistry plugins();
+	public Registry<Plugin> plugins();
 
 	/**
 	 * All users who have used this application.
 	 *
 	 * @return user registry
 	 */
-	public UserRegistry users();
+	public Registry<User> users();
 }
