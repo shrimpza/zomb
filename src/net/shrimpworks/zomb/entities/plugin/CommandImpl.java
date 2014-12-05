@@ -1,11 +1,9 @@
 package net.shrimpworks.zomb.entities.plugin;
 
-import java.io.Serializable;
 import java.util.regex.Pattern;
 
-public class CommandImpl implements Command, Serializable {
+public class CommandImpl implements Command {
 
-	private static final long serialVersionUID = 1l;
 
 	private final String name;
 	private final String help;

@@ -1,13 +1,9 @@
 package net.shrimpworks.zomb.entities.plugin;
 
-import java.io.Serializable;
-
 import net.shrimpworks.zomb.entities.Registry;
 import net.shrimpworks.zomb.entities.RegistryImpl;
 
-public class PluginImpl implements Plugin, Serializable {
-
-	private static final long serialVersionUID = 1l;
+public class PluginImpl implements Plugin {
 
 	private final String name;
 	private final String help;

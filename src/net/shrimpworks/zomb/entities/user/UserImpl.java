@@ -1,10 +1,6 @@
 package net.shrimpworks.zomb.entities.user;
 
-import java.io.Serializable;
-
-public class UserImpl implements User, Serializable {
-
-	private static final long serialVersionUID = 1l;
+public class UserImpl implements User {
 
 	private final String name;
 
