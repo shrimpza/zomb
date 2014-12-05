@@ -9,14 +9,13 @@ import net.shrimpworks.zomb.entities.Response;
 import net.shrimpworks.zomb.entities.ResponseImpl;
 import net.shrimpworks.zomb.entities.plugin.Command;
 import net.shrimpworks.zomb.entities.plugin.CommandImpl;
-import net.shrimpworks.zomb.entities.plugin.CommandRegistryImpl;
 import net.shrimpworks.zomb.entities.plugin.Plugin;
 import net.shrimpworks.zomb.entities.plugin.PluginImpl;
 
 public class Help extends PluginImpl {
 
 	public Help() {
-		super("help", "Provides plugin and command help functions", null, null, new CommandRegistryImpl());
+		super("help", "Provides plugin and command help functions", null, null);
 		commands().add(new CommandImpl("show", "shows help for a plugin or plugin command", 0, "[A-Za-z]+|[A-Za-z]+ [A-Za-z]+"));
 		commands().add(new CommandImpl("list", "list commands available in a plugin", 1, null));
 	}

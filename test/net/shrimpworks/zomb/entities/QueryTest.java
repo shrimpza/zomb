@@ -3,7 +3,6 @@ package net.shrimpworks.zomb.entities;
 import net.shrimpworks.zomb.entities.application.Application;
 import net.shrimpworks.zomb.entities.application.ApplicationImpl;
 import net.shrimpworks.zomb.entities.plugin.CommandImpl;
-import net.shrimpworks.zomb.entities.plugin.CommandRegistryImpl;
 import net.shrimpworks.zomb.entities.plugin.PluginImpl;
 import net.shrimpworks.zomb.entities.user.UserImpl;
 
@@ -20,7 +19,7 @@ public class QueryTest {
 	@Before
 	public void setup() {
 		app = new ApplicationImpl("app", "abc", null, null);
-		app.plugins().add(new PluginImpl("weather", null, null, null, new CommandRegistryImpl()));
+		app.plugins().add(new PluginImpl("weather", null, null, null));
 		app.plugins().find("weather").commands().add(new CommandImpl("current", null, 1, null));
 		app.plugins().find("weather").commands().add(new CommandImpl("tomorrow", null, 1, null));
 		app.plugins().find("weather").commands().add(new CommandImpl("friday", null, 2, null));

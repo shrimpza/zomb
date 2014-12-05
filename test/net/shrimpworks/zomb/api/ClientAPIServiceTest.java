@@ -12,7 +12,6 @@ import net.shrimpworks.zomb.entities.application.ApplicationImpl;
 import net.shrimpworks.zomb.entities.application.ApplicationRegistry;
 import net.shrimpworks.zomb.entities.application.ApplicationRegistryImpl;
 import net.shrimpworks.zomb.entities.plugin.CommandImpl;
-import net.shrimpworks.zomb.entities.plugin.CommandRegistryImpl;
 import net.shrimpworks.zomb.entities.plugin.PluginImpl;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -294,7 +293,7 @@ public class ClientAPIServiceTest {
 				);
 
 		appRegistry.find("client").plugins().add(new PluginImpl("hello", null,
-				String.format("http://localhost:%d/hello", jadlerPort), null, new CommandRegistryImpl()));
+				String.format("http://localhost:%d/hello", jadlerPort), null));
 		appRegistry.find("client").plugins().find("hello").commands().add(new CommandImpl("hello", "say hello world", 0, null));
 
 		String addPlugin = client.post(apiUrl,

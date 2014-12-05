@@ -12,14 +12,13 @@ import net.shrimpworks.zomb.entities.Query;
 import net.shrimpworks.zomb.entities.Response;
 import net.shrimpworks.zomb.entities.ResponseImpl;
 import net.shrimpworks.zomb.entities.plugin.CommandImpl;
-import net.shrimpworks.zomb.entities.plugin.CommandRegistryImpl;
 import net.shrimpworks.zomb.entities.plugin.Plugin;
 import net.shrimpworks.zomb.entities.plugin.PluginImpl;
 
 public class PluginManager extends PluginImpl {
 
 	public PluginManager() {
-		super("plugin", "Provides plugin management functionality", null, null, new CommandRegistryImpl());
+		super("plugin", "Provides plugin management functionality", null, null);
 		commands().add(new CommandImpl("list", "list installed plugins", 0, null));
 		commands().add(new CommandImpl("add", "add a new plugin", 1, null));
 		commands().add(new CommandImpl("remove", "remove an installed plugin", 1, null));
@@ -85,8 +84,7 @@ public class PluginManager extends PluginImpl {
 						pluginDef.get("plugin").asString(),
 						pluginDef.get("help").asString(),
 						query.args().get(0),
-						pluginDef.get("contact").asString(),
-						new CommandRegistryImpl());
+						pluginDef.get("contact").asString());
 
 				for (JsonValue commands : pluginDef.get("commands").asArray()) {
 					plugin.commands().add(new CommandImpl(

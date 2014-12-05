@@ -3,10 +3,9 @@ package net.shrimpworks.zomb.entities.application;
 import java.io.Serializable;
 
 import net.shrimpworks.zomb.entities.Registry;
+import net.shrimpworks.zomb.entities.RegistryImpl;
 import net.shrimpworks.zomb.entities.plugin.Plugin;
-import net.shrimpworks.zomb.entities.plugin.PluginRegistryImpl;
 import net.shrimpworks.zomb.entities.user.User;
-import net.shrimpworks.zomb.entities.user.UserRegistryImpl;
 
 public class ApplicationImpl implements Application, Serializable {
 
@@ -30,7 +29,7 @@ public class ApplicationImpl implements Application, Serializable {
 	}
 
 	public ApplicationImpl(String name, String key, String url, String contact) {
-		this(name, key, url, contact, new PluginRegistryImpl(), new UserRegistryImpl());
+		this(name, key, url, contact, new RegistryImpl<>(), new RegistryImpl<>());
 	}
 
 	@Override

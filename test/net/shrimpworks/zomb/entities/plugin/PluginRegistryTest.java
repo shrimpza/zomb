@@ -1,5 +1,8 @@
 package net.shrimpworks.zomb.entities.plugin;
 
+import net.shrimpworks.zomb.entities.Registry;
+import net.shrimpworks.zomb.entities.RegistryImpl;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -11,7 +14,7 @@ public class PluginRegistryTest {
 
 	@Test
 	public void pluginRegistryTest() {
-		PluginRegistry plugins = new PluginRegistryImpl();
+		Registry<Plugin> plugins = new RegistryImpl<>();
 
 		Plugin pee1 = new PluginImpl("pee1", "help", "linky", "author@mail", null);
 		Plugin pee2 = new PluginImpl("pee2", "help2", "link2", "author@mail", null);

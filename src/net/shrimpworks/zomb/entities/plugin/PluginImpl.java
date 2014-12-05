@@ -3,6 +3,7 @@ package net.shrimpworks.zomb.entities.plugin;
 import java.io.Serializable;
 
 import net.shrimpworks.zomb.entities.Registry;
+import net.shrimpworks.zomb.entities.RegistryImpl;
 
 public class PluginImpl implements Plugin, Serializable {
 
@@ -15,7 +16,7 @@ public class PluginImpl implements Plugin, Serializable {
 	private final String contact;
 
 	public PluginImpl(String name, String help, String url, String contact) {
-		this(name, help, url, contact, new CommandRegistryImpl());
+		this(name, help, url, contact, new RegistryImpl<>());
 	}
 
 	public PluginImpl(String name, String help, String url, String contact, Registry<Command> commands) {

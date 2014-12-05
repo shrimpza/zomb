@@ -1,5 +1,8 @@
 package net.shrimpworks.zomb.entities.user;
 
+import net.shrimpworks.zomb.entities.Registry;
+import net.shrimpworks.zomb.entities.RegistryImpl;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -11,7 +14,7 @@ public class UserRegistryTest {
 
 	@Test
 	public void userRegistryTest() {
-		UserRegistry users = new UserRegistryImpl();
+		Registry<User> users = new RegistryImpl<>();
 
 		User bob = new UserImpl("bob");
 		User joe = new UserImpl("joe");
