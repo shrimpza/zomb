@@ -293,8 +293,8 @@ public class ClientAPIServiceTest {
 								.toString()
 				);
 
-		appRegistry.find("client").plugins().add(new PluginImpl("hello", null, new CommandRegistryImpl(),
-				String.format("http://localhost:%d/hello", jadlerPort), null));
+		appRegistry.find("client").plugins().add(new PluginImpl("hello", null,
+				String.format("http://localhost:%d/hello", jadlerPort), null, new CommandRegistryImpl()));
 		appRegistry.find("client").plugins().find("hello").commands().add(new CommandImpl("hello", "say hello world", 0, null));
 
 		String addPlugin = client.post(apiUrl,

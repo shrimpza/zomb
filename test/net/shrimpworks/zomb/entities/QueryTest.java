@@ -20,7 +20,7 @@ public class QueryTest {
 	@Before
 	public void setup() {
 		app = new ApplicationImpl("app", "abc", null, null);
-		app.plugins().add(new PluginImpl("weather", null, new CommandRegistryImpl(), null, null));
+		app.plugins().add(new PluginImpl("weather", null, null, null, new CommandRegistryImpl()));
 		app.plugins().find("weather").commands().add(new CommandImpl("current", null, 1, null));
 		app.plugins().find("weather").commands().add(new CommandImpl("tomorrow", null, 1, null));
 		app.plugins().find("weather").commands().add(new CommandImpl("friday", null, 2, null));

@@ -13,8 +13,8 @@ public class PluginRegistryTest {
 	public void pluginRegistryTest() {
 		PluginRegistry plugins = new PluginRegistryImpl();
 
-		Plugin pee1 = new PluginImpl("pee1", "help", null, "linky", "author@mail");
-		Plugin pee2 = new PluginImpl("pee2", "help2", null, "link2", "author@mail");
+		Plugin pee1 = new PluginImpl("pee1", "help", "linky", "author@mail", null);
+		Plugin pee2 = new PluginImpl("pee2", "help2", "link2", "author@mail", null);
 
 		assertTrue(plugins.all().isEmpty());
 		assertNull(plugins.find("none"));

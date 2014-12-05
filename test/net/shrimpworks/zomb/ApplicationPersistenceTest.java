@@ -94,8 +94,8 @@ public class ApplicationPersistenceTest {
 
 	@Test
 	public void persistentRegistryTest() throws IOException {
-		Persistence<JsonObject> appStore = new FilesystemPersistence(temp);
-//		PersistentAppRegistry appRegistry = new PersistentAppRegistry(appStore);
+		Persistence<Application> appStore = new AppPersistence(new FilesystemPersistence(temp));
+		PersistentAppRegistry appRegistry = new PersistentAppRegistry(appStore);
 
 		Application application = new ApplicationImpl("app", "key", "http://url.com", "bob <bob@mail>");
 
@@ -109,7 +109,7 @@ public class ApplicationPersistenceTest {
 		application.plugins().add(new PluginImpl("math", "math ops", "http://math.url", "sue@mail", new CommandRegistryImpl()));
 		application.plugins().find("math").commands().add(new CommandImpl("add", "add numbers", 0, ""));
 
-//		appRegistry.add(application);
+		appRegistry.add(application);
 
 		fail("todo");
 	}
@@ -158,6 +158,35 @@ public class ApplicationPersistenceTest {
 			}
 
 			return res;
+		}
+	}
+
+	public static class AppPersistence implements Persistence<Application> {
+
+		private final Persistence<JsonObject> persistence;
+
+		public AppPersistence(Persistence<JsonObject> persistence) {
+			this.persistence = persistence;
+		}
+
+		@Override
+		public boolean save(Application entity) throws IOException {
+			JsonObject json = new JsonObject()
+					.add("name", entity.name())
+					.add("key", entity.key())
+					.add("contact", entity.contact())
+					.add("url", entity.url());
+			return persistence.save(json);
+		}
+
+		@Override
+		public boolean delete(Application entity) throws IOException {
+			throw new UnsupportedOperationException("Method not implemented.");
+		}
+
+		@Override
+		public Collection<Application> all() throws IOException {
+			throw new UnsupportedOperationException("Method not implemented.");
 		}
 	}
 
