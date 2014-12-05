@@ -136,6 +136,36 @@ public class ClientAPIServiceTest {
 								)).toString()
 				);
 
+		Jadler.onRequest()
+				.havingPathEqualTo("/noCmd")
+				.havingMethodEqualTo("GET")
+				.respond()
+				.withContentType("application/json")
+				.withStatus(200)
+				.withBody(
+						new JsonObject()
+								.add("plugin", "noCmd")
+								.add("help", "no commands")
+								.add("contact", "you <you@mail>")
+								.add("commands", new JsonArray()).toString()
+				);
+
+		String fail = client.post(apiUrl, new JsonObject()
+						.add("key", "ckey")
+						.add("user", "jane")
+						.add("query", String.format("plugin add http://localhost:%d/bye", jadlerPort))
+						.toString()
+		);
+		assertTrue(fail.contains("Failed to get plugin"));
+
+		fail = client.post(apiUrl, new JsonObject()
+						.add("key", "ckey")
+						.add("user", "jane")
+						.add("query", String.format("plugin add http://localhost:%d/noCmd", jadlerPort))
+						.toString()
+		);
+		assertTrue(fail.contains("no commands"));
+
 		/*
 		 * add a plugin
 		 */
