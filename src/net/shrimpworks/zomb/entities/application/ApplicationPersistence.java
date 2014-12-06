@@ -14,6 +14,9 @@ import net.shrimpworks.zomb.entities.PersistentRegistry;
 import net.shrimpworks.zomb.entities.plugin.Plugin;
 import net.shrimpworks.zomb.entities.user.User;
 
+/**
+ * Implementation backed by JSON storage for managing Application persistence.
+ */
 public class ApplicationPersistence implements Persistence<Application> {
 
 	private static final Logger logger = Logger.getLogger(ApplicationPersistence.class.getName());

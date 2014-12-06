@@ -2,6 +2,14 @@ package net.shrimpworks.zomb.entities;
 
 import java.io.IOException;
 
+/**
+ * A generic registry implementation which passes added or removed entities to
+ * persistence for storage.
+ *
+ * On creation, it will restore it's contents from storage.
+ *
+ * @param <T> entity type
+ */
 public class PersistentRegistry<T extends HasName> extends RegistryImpl<T> implements Registry<T> {
 
 	private final Persistence<T> persistence;

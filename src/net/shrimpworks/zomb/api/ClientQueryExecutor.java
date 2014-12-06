@@ -4,6 +4,11 @@ import net.shrimpworks.zomb.entities.Query;
 import net.shrimpworks.zomb.entities.Response;
 import net.shrimpworks.zomb.entities.plugin.Plugin;
 
+/**
+ * A Client Query Executor implementation is expected to process a
+ * query passed to it via the API, and return a response, which the
+ * API will in turn return to the client.
+ */
 public interface ClientQueryExecutor {
 
 	/**

@@ -4,7 +4,6 @@ import java.util.regex.Pattern;
 
 public class CommandImpl implements Command {
 
-
 	private final String name;
 	private final String help;
 	private final int args;
