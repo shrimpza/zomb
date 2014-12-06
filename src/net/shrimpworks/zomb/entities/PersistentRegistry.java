@@ -1,9 +1,8 @@
 package net.shrimpworks.zomb.entities;
 
 import java.io.IOException;
-import java.io.Serializable;
 
-public class PersistentRegistry<T extends HasName> extends RegistryImpl<T> implements Registry<T>, Serializable {
+public class PersistentRegistry<T extends HasName> extends RegistryImpl<T> implements Registry<T> {
 
 	private final Persistence<T> persistence;
 

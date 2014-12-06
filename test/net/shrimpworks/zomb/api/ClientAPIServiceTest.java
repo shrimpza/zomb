@@ -49,7 +49,7 @@ public class ClientAPIServiceTest {
 		executors.add(new Help.Executor());
 		executors.add(new HttpExecutor());
 
-		this.service = new ClientAPIServiceImpl(host, port, appRegistry, executors);
+		this.service = new ClientAPIService(host, port, appRegistry, executors);
 
 		this.client = new HttpClient(1000);
 
