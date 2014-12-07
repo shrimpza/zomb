@@ -22,13 +22,11 @@ public class ApplicationPersistence implements Persistence<Application> {
 	private static final Logger logger = Logger.getLogger(ApplicationPersistence.class.getName());
 
 	private final Persistence<JsonObject> persistence;
-	private final Persistence<Plugin> pluginPersistence;
-	private final Persistence<User> userPersistence;
+	private final ApplicationPersistenceFactory applicationPersistenceFactory;
 
-	public ApplicationPersistence(Persistence<JsonObject> persistence, Persistence<Plugin> pluginPersistence, Persistence<User> userPersistence) {
+	public ApplicationPersistence(Persistence<JsonObject> persistence, ApplicationPersistenceFactory applicationPersistenceFactory) {
 		this.persistence = persistence;
-		this.pluginPersistence = pluginPersistence;
-		this.userPersistence = userPersistence;
+		this.applicationPersistenceFactory = applicationPersistenceFactory;
 	}
 
 	@Override
@@ -57,8 +55,8 @@ public class ApplicationPersistence implements Persistence<Application> {
 						j.get("key").asString(),
 						j.get("url").asString(),
 						j.get("contact").asString(),
-						new PersistentRegistry<>(pluginPersistence),
-						new PersistentRegistry<>(userPersistence)
+						new PersistentRegistry<>(applicationPersistenceFactory.pluginPersistence(j.get("name").asString())),
+						new PersistentRegistry<>(applicationPersistenceFactory.userPersistence(j.get("name").asString()))
 				);
 			} catch (IOException e) {
 				logger.log(Level.WARNING, "Failed to load application", e);
@@ -67,5 +65,12 @@ public class ApplicationPersistence implements Persistence<Application> {
 		}).collect(Collectors.toSet());
 
 		return Collections.unmodifiableCollection(all);
+	}
+
+	public interface ApplicationPersistenceFactory {
+
+		public Persistence<Plugin> pluginPersistence(String application) throws IOException;
+
+		public Persistence<User> userPersistence(String application) throws IOException;
 	}
 }
