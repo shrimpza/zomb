@@ -6,9 +6,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.shrimpworks.zomb.entities.FilesystemPersistence;
-import net.shrimpworks.zomb.entities.Persistence;
-import net.shrimpworks.zomb.entities.PersistentRegistry;
 import net.shrimpworks.zomb.entities.application.Application;
 import net.shrimpworks.zomb.entities.application.ApplicationImpl;
 import net.shrimpworks.zomb.entities.application.ApplicationPersistence;
