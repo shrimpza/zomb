@@ -40,10 +40,24 @@ public class Zomb {
 		executors.add(new Help.Executor());
 		executors.add(new HttpExecutor());
 
-		Persistence<Application> appStore = new ApplicationPersistence(new FilesystemPersistence(path), null);
-		ApplicationRegistry appRegistry = new ApplicationRegistryImpl(appStore);
+		final Persistence<Application> appStore = new ApplicationPersistence(new FilesystemPersistence(path), null);
+		final ApplicationRegistry appRegistry = new ApplicationRegistryImpl(appStore);
 
-		ClientAPIService service = new ClientAPIService("0.0.0.0", port, appRegistry, executors);
+		appRegistry.all().forEach(a -> {
+			a.plugins().add(new PluginManager());
+			a.plugins().add(new Help());
+		});
+
+		final ClientAPIService service = new ClientAPIService("0.0.0.0", port, appRegistry, executors);
+
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			try {
+				service.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}));
+
 		System.out.printf("Listening on port %d with %d known application(s)%n", port, appRegistry.all().size());
 	}
 
