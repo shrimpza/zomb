@@ -13,6 +13,12 @@ import java.util.logging.Logger;
 
 import com.eclipsesource.json.JsonObject;
 
+/**
+ * Persistence implementation which stores JSON objects on the file system
+ * in the path provided.
+ * <p>
+ * If the path does not exist, it will be created at time of instantiation.
+ */
 public class FilesystemPersistence implements Persistence<JsonObject> {
 
 	private static final Logger logger = Logger.getLogger(FilesystemPersistence.class.getName());

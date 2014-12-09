@@ -12,6 +12,15 @@ import net.shrimpworks.zomb.entities.plugin.CommandImpl;
 import net.shrimpworks.zomb.entities.plugin.Plugin;
 import net.shrimpworks.zomb.entities.plugin.PluginImpl;
 
+/**
+ * Provides plugin and command help functionality.
+ * <p>
+ * Commands supported by help are:
+ * <ul>
+ * <li>show - shows help for a plugin or plugin command</li>
+ * <li>list - list commands available in a plugin</li>
+ * </ul>
+ */
 public class Help extends PluginImpl {
 
 	public Help() {

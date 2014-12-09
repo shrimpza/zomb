@@ -12,6 +12,9 @@ import net.shrimpworks.zomb.entities.Response;
 import net.shrimpworks.zomb.entities.ResponseImpl;
 import net.shrimpworks.zomb.entities.plugin.Plugin;
 
+/**
+ * Executes remotely hosted plugins via HTTP.
+ */
 public class HttpExecutor implements ClientQueryExecutor {
 
 	private static final Logger logger = Logger.getLogger(HttpExecutor.class.getName());

@@ -6,19 +6,15 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.shrimpworks.zomb.entities.FilesystemPersistence;
-import net.shrimpworks.zomb.entities.Persistence;
-import net.shrimpworks.zomb.entities.PersistentRegistry;
 import net.shrimpworks.zomb.entities.application.Application;
+import net.shrimpworks.zomb.entities.application.ApplicationFilesystemPersistenceFactory;
 import net.shrimpworks.zomb.entities.application.ApplicationImpl;
 import net.shrimpworks.zomb.entities.application.ApplicationPersistence;
 import net.shrimpworks.zomb.entities.plugin.CommandImpl;
 import net.shrimpworks.zomb.entities.plugin.Plugin;
 import net.shrimpworks.zomb.entities.plugin.PluginImpl;
-import net.shrimpworks.zomb.entities.plugin.PluginPersistence;
 import net.shrimpworks.zomb.entities.user.User;
 import net.shrimpworks.zomb.entities.user.UserImpl;
-import net.shrimpworks.zomb.entities.user.UserPersistence;
 
 import org.junit.After;
 import org.junit.Before;
@@ -48,13 +44,12 @@ public class PersistenceTest {
 	@Test
 	public void persistentRegistryTest() throws IOException {
 
-		Persistence<Plugin> plugStore = new PluginPersistence(new FilesystemPersistence(temp.resolve(appName + ".plugins")));
-		Persistence<User> userStore = new UserPersistence(new FilesystemPersistence(temp.resolve(appName + ".users")));
-		Persistence<Application> appStore = new ApplicationPersistence(new FilesystemPersistence(temp), plugStore, userStore);
+		ApplicationPersistence.ApplicationPersistenceFactory appPersistence = new ApplicationFilesystemPersistenceFactory(temp);
+		Persistence<Application> appStore = new ApplicationPersistence(new FilesystemPersistence(temp), appPersistence);
 
 		PersistentRegistry<Application> appRegistry = new PersistentRegistry<>(appStore);
-		PersistentRegistry<Plugin> pluginRegistry = new PersistentRegistry<>(plugStore);
-		PersistentRegistry<User> userRegistry = new PersistentRegistry<>(userStore);
+		PersistentRegistry<Plugin> pluginRegistry = new PersistentRegistry<>(appPersistence.pluginPersistence(appName));
+		PersistentRegistry<User> userRegistry = new PersistentRegistry<>(appPersistence.userPersistence(appName));
 
 		Application application = new ApplicationImpl(appName, "key", "http://url.com", "bob <bob@mail>", pluginRegistry, userRegistry);
 

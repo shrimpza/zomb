@@ -15,6 +15,16 @@ import net.shrimpworks.zomb.entities.plugin.CommandImpl;
 import net.shrimpworks.zomb.entities.plugin.Plugin;
 import net.shrimpworks.zomb.entities.plugin.PluginImpl;
 
+/**
+ * Provides plugin management functionality for an application.
+ * <p>
+ * Commands supported by the plugin manager are:
+ * <ul>
+ * <li>list - lists installed plugins</li>
+ * <li>add - add a new plugin</li>
+ * <li>remove - remove an installed plugin</li>
+ * </ul>
+ */
 public class PluginManager extends PluginImpl {
 
 	public PluginManager() {

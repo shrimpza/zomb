@@ -2,7 +2,7 @@
 <project name="zomb" default="dist" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 
     <!-- for a runnable jar file, add the main class name -->
-    <property name="main.class" value=""/>
+    <property name="main.class" value="net.shrimpworks.zomb.Zomb"/>
 
     <!-- basic paths -->
     <property name="src.dir" location="src"/>
@@ -24,6 +24,10 @@
     <path id="test.classpath">
         <fileset dir="${lib.dir}" includes="test/*.jar"/>
         <pathelement path="${build.test.dir}"/>
+    </path>
+
+    <path id="dist.classpath">
+        <fileset dir="${dist.dir}" includes="lib/*.jar"/>
     </path>
 
     <target name="init">
@@ -72,6 +76,7 @@
     <!-- Generate Javadocs -->
     <target name="docs" depends="build">
         <javadoc packagenames="src" sourcepath="${src.dir}" destdir="${build.javadoc.dir}">
+            <classpath refid="default.classpath"/>
             <fileset dir="${src.dir}" includes="**/*.java"/>
         </javadoc>
 
@@ -82,13 +87,6 @@
     <!-- Build distribution -->
     <target name="dist" depends="build,docs" description="generate distribution">
         <mkdir dir="${dist.dir}/lib"/>
-        <jar jarfile="${dist.dir}/${ant.project.name}.jar">
-            <manifest>
-                <attribute name="Main-Class" value="${main.class}"/>
-            </manifest>
-            <fileset dir="${build.src.dir}" />
-            <zipfileset dir="${src.dir}" excludes="**/*.java"/>
-        </jar>
 
         <copy todir="${dist.dir}/lib">
             <fileset dir="${lib.dir}/default" includes="*.jar" erroronmissingdir="false">
@@ -96,6 +94,19 @@
                 <exclude name="**/*-sources.jar"/>
             </fileset>
         </copy>
+
+        <manifestclasspath property="dist.manifest.classpath" jarfile="${dist.dir}/${ant.project.name}.jar">
+            <classpath refid="dist.classpath" />
+        </manifestclasspath>
+
+        <jar jarfile="${dist.dir}/${ant.project.name}.jar">
+            <manifest>
+                <attribute name="Main-Class" value="${main.class}"/>
+                <attribute name="Class-Path" value="${dist.manifest.classpath}"/>
+            </manifest>
+            <fileset dir="${build.src.dir}" />
+            <zipfileset dir="${src.dir}" excludes="**/*.java"/>
+        </jar>
 
         <zip destfile="${dist.dir}/${ant.project.name}.zip">
             <zipfileset dir="${dist.dir}/lib" prefix="lib"/>

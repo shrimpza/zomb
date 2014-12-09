@@ -12,6 +12,9 @@ import net.shrimpworks.zomb.entities.Persistence;
 import net.shrimpworks.zomb.entities.Registry;
 import net.shrimpworks.zomb.entities.RegistryImpl;
 
+/**
+ * Implementation backed by JSON storage for managing Plugin persistence.
+ */
 public class PluginPersistence implements Persistence<Plugin> {
 
 	private final Persistence<JsonObject> persistence;

@@ -9,6 +9,9 @@ import java.util.stream.Collectors;
 import com.eclipsesource.json.JsonObject;
 import net.shrimpworks.zomb.entities.Persistence;
 
+/**
+ * Implementation backed by JSON storage for managing User persistence.
+ */
 public class UserPersistence implements Persistence<User> {
 
 	private final Persistence<JsonObject> persistence;

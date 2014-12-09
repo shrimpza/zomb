@@ -21,6 +21,9 @@ import net.shrimpworks.zomb.entities.application.ApplicationRegistry;
 import net.shrimpworks.zomb.entities.user.User;
 import net.shrimpworks.zomb.entities.user.UserImpl;
 
+/**
+ * Implements the HTTP API which clients interact with.
+ */
 public class ClientAPIService implements Closeable {
 
 	private static final Logger logger = Logger.getLogger(ClientAPIService.class.getName());

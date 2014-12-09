@@ -1,5 +1,5 @@
 # ZOMB 
-[![Build Status](https://travis-ci.org/shrimpza/zomb.svg?branch=master)](https://travis-ci.org/shrimpza/zomb)
+[![Build Status](https://drone.io/github.com/shrimpza/zomb/status.png)](https://drone.io/github.com/shrimpza/zomb/latest)
 
 ZOMB provides an API-driven HTTP back-end for an IRC bot style command
 processor, where functionality is implemented in remotely-hosted HTTP based
