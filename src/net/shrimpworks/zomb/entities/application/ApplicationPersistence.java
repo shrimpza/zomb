@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import com.eclipsesource.json.JsonObject;
 import net.shrimpworks.zomb.entities.Persistence;
 import net.shrimpworks.zomb.entities.PersistentRegistry;
+import net.shrimpworks.zomb.entities.RegistryImpl;
 import net.shrimpworks.zomb.entities.plugin.Plugin;
 import net.shrimpworks.zomb.entities.user.User;
 
@@ -55,8 +56,12 @@ public class ApplicationPersistence implements Persistence<Application> {
 						j.get("key").asString(),
 						j.get("url").asString(),
 						j.get("contact").asString(),
-						new PersistentRegistry<>(applicationPersistenceFactory.pluginPersistence(j.get("name").asString())),
-						new PersistentRegistry<>(applicationPersistenceFactory.userPersistence(j.get("name").asString()))
+						applicationPersistenceFactory != null
+								? new PersistentRegistry<>(applicationPersistenceFactory.pluginPersistence(j.get("name").asString()))
+								: new RegistryImpl<>(),
+						applicationPersistenceFactory != null
+								? new PersistentRegistry<>(applicationPersistenceFactory.userPersistence(j.get("name").asString()))
+								: new RegistryImpl<>()
 				);
 			} catch (IOException e) {
 				logger.log(Level.WARNING, "Failed to load application", e);

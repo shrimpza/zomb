@@ -1,5 +1,7 @@
 package net.shrimpworks.zomb.entities.application;
 
+import java.io.IOException;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -9,8 +11,8 @@ import static org.junit.Assert.assertTrue;
 public class ApplicationRegistryTest {
 
 	@Test
-	public void appRegistryTest() {
-		ApplicationRegistry reg = new ApplicationRegistryImpl();
+	public void appRegistryTest() throws IOException {
+		ApplicationRegistry reg = new ApplicationRegistryImpl(new NopApplicationPersistence());
 
 		Application app1 = new ApplicationImpl("app1", "abc", "url", "guy");
 		Application app2 = new ApplicationImpl("app2", "123", "earl", "person@mail");
@@ -34,4 +36,6 @@ public class ApplicationRegistryTest {
 		assertEquals(app2, reg.find("app2"));
 		assertEquals(app2, reg.forKey("123"));
 	}
+
+
 }
