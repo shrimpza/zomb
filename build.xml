@@ -2,7 +2,7 @@
 <project name="zomb" default="dist" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 
     <!-- for a runnable jar file, add the main class name -->
-    <property name="main.class" value=""/>
+    <property name="main.class" value="net.shrimpworks.zomb.Zomb"/>
 
     <!-- basic paths -->
     <property name="src.dir" location="src"/>
