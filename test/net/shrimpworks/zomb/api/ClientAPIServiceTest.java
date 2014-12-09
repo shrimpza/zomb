@@ -11,6 +11,7 @@ import net.shrimpworks.zomb.common.HttpClient;
 import net.shrimpworks.zomb.entities.application.ApplicationImpl;
 import net.shrimpworks.zomb.entities.application.ApplicationRegistry;
 import net.shrimpworks.zomb.entities.application.ApplicationRegistryImpl;
+import net.shrimpworks.zomb.entities.application.NopApplicationPersistence;
 import net.shrimpworks.zomb.entities.plugin.CommandImpl;
 import net.shrimpworks.zomb.entities.plugin.PluginImpl;
 import org.hamcrest.BaseMatcher;
@@ -38,7 +39,7 @@ public class ClientAPIServiceTest {
 
 	@Before
 	public void setup() throws IOException {
-		this.appRegistry = new ApplicationRegistryImpl();
+		this.appRegistry = new ApplicationRegistryImpl(new NopApplicationPersistence());
 
 		this.appRegistry.add(new ApplicationImpl("client", "ckey", null, null));
 		this.appRegistry.find("client").plugins().add(new PluginManager());

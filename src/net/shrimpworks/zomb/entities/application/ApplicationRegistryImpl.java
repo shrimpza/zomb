@@ -1,8 +1,15 @@
 package net.shrimpworks.zomb.entities.application;
 
-import net.shrimpworks.zomb.entities.RegistryImpl;
+import java.io.IOException;
 
-public class ApplicationRegistryImpl extends RegistryImpl<Application> implements ApplicationRegistry {
+import net.shrimpworks.zomb.entities.Persistence;
+import net.shrimpworks.zomb.entities.PersistentRegistry;
+
+public class ApplicationRegistryImpl extends PersistentRegistry<Application> implements ApplicationRegistry {
+
+	public ApplicationRegistryImpl(Persistence<Application> persistence) throws IOException {
+		super(persistence);
+	}
 
 	@Override
 	public Application forKey(String key) {

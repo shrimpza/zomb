@@ -52,6 +52,8 @@ public class ClientAPIService implements Closeable {
 		@Override
 		public void handle(HttpExchange httpExchange) throws IOException {
 			try {
+				httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*"); // TODO config
+
 				if (!httpExchange.getRequestMethod().equals("POST")) {
 					respond(httpExchange, 405); // method not allowed - only POST supported
 				} else {
