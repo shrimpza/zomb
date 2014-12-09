@@ -16,7 +16,7 @@ public class Zomb {
 
 	public static void main(String[] args) throws IOException {
 		if (args.length == 0) {
-			System.err.print("HTTP listen port expected");
+			System.err.println("HTTP listen port expected");
 			System.exit(1);
 		}
 
