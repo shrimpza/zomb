@@ -292,7 +292,7 @@ POST to the base URL:
 An application entity (see above), with the key populated.
 
 
-### Get Retrieve Application
+### Retrieve Application:
 
 GET to URL:
 

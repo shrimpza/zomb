@@ -4,6 +4,9 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -71,7 +74,7 @@ public class ApplicationAPITest {
 		assertTrue(res.get("users").asArray().isEmpty());
 
 		// query application by key
-		res = JsonObject.readFrom(client.get(String.format("%s/%s", apiUrl, res.get("key").asString())));
+		res = JsonObject.readFrom(client.get(String.format("%s/%s", apiUrl, res.get("key").asString()))); // get by key
 		assertEquals(newApp.get("name").asString(), res.get("name").asString());
 		assertFalse(res.get("plugins").asArray().isEmpty());
 		assertTrue(res.get("users").asArray().isEmpty());
@@ -83,15 +86,25 @@ public class ApplicationAPITest {
 		assertTrue(res.get("users").asArray().isEmpty());
 
 		// request all applications
-		res = JsonObject.readFrom(client.get(apiUrl));
-		assertFalse(res.asArray().isEmpty());
-		assertEquals(2, res.asArray().size());
-		assertEquals("client", res.asArray().get(0).asObject().get("name").asString());
-		assertEquals("test-app", res.asArray().get(1).asObject().get("name").asString());
+		JsonArray list = JsonArray.readFrom(client.get(apiUrl));
+		assertFalse(list.isEmpty());
+		assertEquals(2, list.size());
+		Set<String> expectedApps = new HashSet<>(Arrays.asList("client", "test-app"));
+		Set<String> foundApps = new HashSet<>();
 
-		// TODO delete application
+		for (int i = 0; i < list.size(); i++) {
+			foundApps.add(list.get(i).asObject().get("name").asString());
+		}
 
-		// TODO request all applications, ensuring deleted is gone
+		assertEquals(expectedApps, foundApps);
+
+		// delete application
+		client.delete(String.format("%s/%s", apiUrl, newApp.get("name").asString())); // delete by name
+		client.delete(String.format("%s/%s", apiUrl, "ckey")); // delete by key
+
+		// request all applications, ensuring deleted are gone
+		list = JsonArray.readFrom(client.get(apiUrl));
+		assertTrue(list.isEmpty());
 	}
 
 	public static class ApplicationAPIService implements Closeable {
@@ -156,7 +169,10 @@ public class ApplicationAPITest {
 								respond(httpExchange, 404); // not found
 							}
 						} else {
-							// TODO catch-all "all" request
+							JsonArray apps = new JsonArray();
+							appRegistry.all().forEach(a -> apps.add(application(a)));
+
+							respond(httpExchange, 200, apps.toString());
 						}
 
 					} else {
