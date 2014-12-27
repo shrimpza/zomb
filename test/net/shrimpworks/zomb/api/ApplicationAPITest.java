@@ -155,6 +155,22 @@ public class ApplicationAPITest {
 						}
 
 					} else if (httpExchange.getRequestMethod().equals("DELETE")) {
+						String path = httpExchange.getRequestURI().getPath();
+						if (path.matches("/.+/.+")) {
+							String key = path.split("/")[2]; // lol string splits again
+							Application app = appRegistry.forKey(key);
+							if (app == null) app = appRegistry.find(key);
+
+							if (app == null) {
+								respond(httpExchange, 404); // not found
+							} else if (appRegistry.remove(app) != null) {
+								respond(httpExchange, 200); // success
+							} else {
+								respond(httpExchange, 500); // failed to delete
+							}
+						} else {
+							respond(httpExchange, 400);
+						}
 
 					} else if (httpExchange.getRequestMethod().equals("GET")) {
 						String path = httpExchange.getRequestURI().getPath();
