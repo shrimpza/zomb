@@ -236,6 +236,10 @@ base URL is as follows:
   http://zomb-host:port/applications
 ```
 
+Aside from their plugin and user content, client application definitions are
+considered immutable, and therefor no "update" functionality is provided. The
+correct way to "update" an application would be to remove and re-add it.
+
 An Application Entity is defined as the following JSON structure, and is used
 whenever an application is returned by the API:
 
@@ -244,8 +248,8 @@ whenever an application is returned by the API:
   "key": "unique-application-key",
   "name": "app-name",
   "url": "http://url.to/app-info",
-  "contact": "guy <contact@info>"
-  "plugins": ["plugin","help","weather","calculator"]
+  "contact": "guy <contact@info>",
+  "plugins": ["plugin","help","weather","calculator"],
   "users": ["bob","joe","dude"]
 }
 ```

@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import net.shrimpworks.zomb.entities.Query;
 import net.shrimpworks.zomb.entities.QueryImpl;
@@ -32,8 +31,9 @@ public class ClientAPIService implements Closeable {
 	private final ApplicationRegistry appRegistry;
 	private final Set<ClientQueryExecutor> executors;
 
-	public ClientAPIService(String listenHost, int listenPort, ApplicationRegistry appRegistry,
-							Set<ClientQueryExecutor> executors) throws IOException {
+	public ClientAPIService(
+			String listenHost, int listenPort, ApplicationRegistry appRegistry,
+			Set<ClientQueryExecutor> executors) throws IOException {
 		this.appRegistry = appRegistry;
 		this.executors = executors;
 
@@ -47,7 +47,7 @@ public class ClientAPIService implements Closeable {
 		this.httpServer.stop(0);
 	}
 
-	private class RootHandler implements HttpHandler {
+	private class RootHandler extends HttpAPIHandler {
 
 		@Override
 		public void handle(HttpExchange httpExchange) throws IOException {
@@ -98,15 +98,6 @@ public class ClientAPIService implements Closeable {
 			} finally {
 				httpExchange.close();
 			}
-		}
-
-		private void respond(HttpExchange exchange, int status) throws IOException {
-			respond(exchange, status, null);
-		}
-
-		private void respond(HttpExchange exchange, int status, String body) throws IOException {
-			exchange.sendResponseHeaders(status, body == null || body.isEmpty() ? -1 : body.length());
-			if (body != null && !body.isEmpty()) exchange.getResponseBody().write(body.getBytes());
 		}
 
 		private JsonObject jsonResponse(Response response) {
