@@ -70,11 +70,24 @@ public class ApplicationAPITest {
 		assertFalse(res.get("plugins").asArray().isEmpty());
 		assertTrue(res.get("users").asArray().isEmpty());
 
-		// TODO query application by key
+		// query application by key
+		res = JsonObject.readFrom(client.get(String.format("%s/%s", apiUrl, res.get("key").asString())));
+		assertEquals(newApp.get("name").asString(), res.get("name").asString());
+		assertFalse(res.get("plugins").asArray().isEmpty());
+		assertTrue(res.get("users").asArray().isEmpty());
 
-		// TODO query application by name
+		// query application by name
+		res = JsonObject.readFrom(client.get(String.format("%s/%s", apiUrl, newApp.get("name").asString())));
+		assertEquals(newApp.get("name").asString(), res.get("name").asString());
+		assertFalse(res.get("plugins").asArray().isEmpty());
+		assertTrue(res.get("users").asArray().isEmpty());
 
-		// TODO request all applications
+		// request all applications
+		res = JsonObject.readFrom(client.get(apiUrl));
+		assertFalse(res.asArray().isEmpty());
+		assertEquals(2, res.asArray().size());
+		assertEquals("client", res.asArray().get(0).asObject().get("name").asString());
+		assertEquals("test-app", res.asArray().get(1).asObject().get("name").asString());
 
 		// TODO delete application
 
@@ -131,6 +144,20 @@ public class ApplicationAPITest {
 					} else if (httpExchange.getRequestMethod().equals("DELETE")) {
 
 					} else if (httpExchange.getRequestMethod().equals("GET")) {
+						String path = httpExchange.getRequestURI().getPath();
+						if (path.matches("/.+/.+")) {
+							String key = path.split("/")[2]; // lol string splits
+							Application app = appRegistry.forKey(key);
+							if (app == null) app = appRegistry.find(key);
+
+							if (app != null) {
+								respond(httpExchange, 200, application(app).toString());
+							} else {
+								respond(httpExchange, 404); // not found
+							}
+						} else {
+							// TODO catch-all "all" request
+						}
 
 					} else {
 						respond(httpExchange, 405); // method not allowed
