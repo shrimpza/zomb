@@ -41,12 +41,23 @@ public class HttpClient {
 		return httpRequest("POST", requestUrl, body);
 	}
 
+	/**
+	 * DELETE a URL
+	 *
+	 * @param requestUrl the URL of the page/service to delete
+	 * @return http server response
+	 * @throws IOException something went wrong
+	 */
+	public String delete(String requestUrl) throws IOException {
+		return httpRequest("DELETE", requestUrl, null);
+	}
+
 	private String httpRequest(String method, String requestUrl, String body) throws IOException {
 		HttpURLConnection conn = null;
 
 		try {
 			URL url = new URL(requestUrl);
-			conn = (HttpURLConnection) url.openConnection();
+			conn = (HttpURLConnection)url.openConnection();
 			conn.setRequestMethod(method);
 			conn.setDoOutput(body != null && !body.isEmpty());
 			conn.setReadTimeout(readTimeout);
