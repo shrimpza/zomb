@@ -267,8 +267,14 @@ whenever an application is returned by the API:
 - `users`<br/>
   list of known users
 
+At present there is no UI for client application management, however below are
+some `curl` example requests (the GET/retrieval requests may be easily
+accessed via web browser).
+
 
 ### Add Application
+
+#### Request
 
 POST to the base URL:
 
@@ -287,12 +293,21 @@ POST to the base URL:
 - `contact`<br/>
   optional contact information for the person responsible for the application
 
-### Response:
+Example:
+
+```
+$ curl -d '{"name":"client-app","url":"http://website/","contact":"dude"}' http://localhost:8081/applications
+```
+
+
+#### Response:
 
 An application entity (see above), with the key populated.
 
 
 ### Retrieve Application:
+
+#### Request:
 
 GET to URL:
 
@@ -302,12 +317,14 @@ GET to URL:
 
 Either the application name or key may be provided.
 
-### Response:
+#### Response:
 
 An application entity (see above).
 
 
 ### List All Applications:
+
+#### Request:
 
 GET to URL:
 
@@ -315,12 +332,14 @@ GET to URL:
   http://zomb-host:port/applications/
 ```
 
-### Response:
+#### Response:
 
 A list of application entities.
 
 
 ### Remove Application:
+
+#### Request:
 
 DELETE to URL:
 
@@ -330,6 +349,14 @@ DELETE to URL:
 
 Either the application name or key may be provided.
 
-### Response:
+Example:
+
+
+```
+$ curl -X "DELETE" http://localhost:8081/applications/client-app
+```
+
+
+#### Response:
 
 Empty response with HTTP code 200 on success.
