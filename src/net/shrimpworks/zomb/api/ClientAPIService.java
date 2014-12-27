@@ -32,8 +32,7 @@ public class ClientAPIService implements Closeable {
 	private final Set<ClientQueryExecutor> executors;
 
 	public ClientAPIService(
-			String listenHost, int listenPort, ApplicationRegistry appRegistry,
-			Set<ClientQueryExecutor> executors) throws IOException {
+			String listenHost, int listenPort, ApplicationRegistry appRegistry, Set<ClientQueryExecutor> executors) throws IOException {
 		this.appRegistry = appRegistry;
 		this.executors = executors;
 
