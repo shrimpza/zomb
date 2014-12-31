@@ -12,7 +12,26 @@ plugin services.
 - [Client Application Management API](https://github.com/shrimpza/zomb/wiki/Application-API)
 
 
-## Usage
+## Client Usage
+
+The following are commands issued by a user via a ZOMB client (see
+[zomb-web](https://github.com/shrimpza/zomb-web/) as an example). The same
+interactions may be achieved programmatically via the Client API.
+
+### General Usage
+
+Instructions are given in the following format:
+
+`<plugin-name> <command> [arguments]`
+
+- `<plugin-name>`<br/>
+  name of an installed plugin
+- `<command>`<br/>
+  a command which exists within the plugin specified
+- `[arguments]`<br/>
+  many commands require additional arguments, which may be passed to the
+  command as a space-separated list. multi-word arguments may be surrounded
+  by double or single quotes
 
 ### Plugin Management
 
