@@ -5,6 +5,13 @@ ZOMB provides an API-driven HTTP back-end for an IRC bot style command
 processor, where functionality is implemented in remotely-hosted HTTP based
 plugin services.
 
+## Clients
+
+To actually "use" ZOMB, a client application is required:
+
+- [zomb-web](https://github.com/shrimpza/zomb-web/) - a browser-based client
+- [zomb-cli](https://github.com/shrimpza/zomb-cli/) - a command-line client suitable for use from a terminal
+
 ## API documentation
 
 - [Client API](https://github.com/shrimpza/zomb/wiki/Client-API)
